@@ -40,9 +40,13 @@ def _load_audio_as_array(audio_path, sample_rate):
     with tf.io.gfile.GFile(audio_path, 'rb') as f:
         # Load audio at original SR
         audio_segment = (pydub.AudioSegment.from_file(f).set_channels(1))
+        print(f"frame_count in original audio: {audio_segment.frame_count()}")
         # Compute expected length at given `sample_rate`
         expected_len = int(audio_segment.duration_seconds * sample_rate)
-        print(f"expected_len (samples): {expected_len}")
+        print(f"duration in secs: {audio_segment.duration_seconds}")
+        print(f"sample_rate: {sample_rate}")
+        print(f"expected_len (in samples): {expected_len}")
+
         # Resample to `sample_rate`
         audio_segment = audio_segment.set_frame_rate(sample_rate)
         sample_arr = audio_segment.get_array_of_samples()
