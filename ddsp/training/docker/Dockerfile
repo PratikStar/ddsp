@@ -17,7 +17,7 @@ RUN apt-get update && \
 # Upgrades Tensorflow and Tensorflow Probability
 # Newer version of Tensorflow is needed for multiple VMs training
 RUN pip install --upgrade pip && \
-    pip install --upgrade tensorflow tensorflow-probability
+    pip install --upgrade tensorflow==2.11.0rc0 tensorflow-probability
 
 # Installs cloudml-hypertune package needed for hyperparameter tuning
 RUN pip install cloudml-hypertune

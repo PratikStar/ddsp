@@ -186,11 +186,39 @@ wget https://developer.download.nvidia.com/compute/cuda/repos/debian11/x86_64/cu
 ```
 
 
+## Image build and push
+cd /root/ddsp/ddsp/training/docker
+
 export PROJECT_ID=ddsp-366504
 export IMAGE_REPO_NAME=ddsp_train
 export IMAGE_TAG=ai_platform
 export IMAGE_URI=gcr.io/$PROJECT_ID/$IMAGE_REPO_NAME:$IMAGE_TAG
 
+[//]: #(https://stackoverflow.com/questions/55446787/permission-issues-while-docker-push) 
 
 
-# https://stackoverflow.com/questions/55446787/permission-issues-while-docker-push
+## Submit job
+
+export SAVE_DIR=gs://pratik-ddsp-models
+export FILE_PATTERN=gs://pratik-ddsp-tfrecord/train.tfrecord*
+export REGION=us-east1
+export JOB_NAME=ddsp_container_job_$(date +%Y%m%d_%H%M%S)
+
+cd /root/ddsp/ddsp/training/docker
+
+gcloud ai-platform jobs submit training $JOB_NAME \
+  --region $REGION \
+  --config config_single_vm.yaml \
+  --master-image-uri $IMAGE_URI \
+  -- \
+  --save_dir=$SAVE_DIR \
+  --file_pattern=$FILE_PATTERN \
+  --batch_size=16 \
+  --learning_rate=0.0001 \
+  --num_steps=40000 \
+  --early_stop_loss_value=5.0
+
+
+gcloud ai-platform jobs list
+
+[comment]: <> (https://console.cloud.google.com/ai-platform/jobs?authuser=1&project=ddsp-366504)
