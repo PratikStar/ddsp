@@ -166,6 +166,13 @@ ddsp_prepare_tfrecord \
 --num_shards=10 \
 --alsologtostderr
 
+
+python /root/ddsp/ddsp/training/data_preparation/ddsp_prepare_tfrecord.py \
+--input_audio_filepatterns='/root/bucket/*wav' \
+--output_tfrecord_path=/root/tfrecord_python/train.tfrecord \
+--num_shards=10 \
+--alsologtostderr
+
 # just download tfrecords from wisteria to test ddsp_run
 rsync -av w:/work/gk77/k77021/data/ddsp/monophonic "/Users/pratik/data/ddsp_tfrecords"
 
@@ -196,6 +203,8 @@ export IMAGE_URI=gcr.io/$PROJECT_ID/$IMAGE_REPO_NAME:$IMAGE_TAG
 
 [//]: #(https://stackoverflow.com/questions/55446787/permission-issues-while-docker-push) 
 
+docker build -f Dockerfile -t $IMAGE_URI ./
+docker push $IMAGE_URI
 
 ## Submit job
 

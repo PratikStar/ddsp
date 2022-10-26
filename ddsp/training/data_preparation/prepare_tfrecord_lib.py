@@ -185,17 +185,23 @@ def prepare_tfrecord(input_audio_paths,
       will be added to actual path(s).
     num_shards: The number of shards to use for the TFRecord. If None, this
       number will be determined automatically.
+      ??
     sample_rate: The sample rate to use for the audio.
+    THE DESIRED SAMPLE RATE!!
     frame_rate: The frame rate to use for f0 and loudness features. If set to
       None, these features will not be computed.
+      ??
     example_secs: The size of the sliding window (in seconds) to use to split
       the audio and features. If 0, they will not be split.
+      ??
     hop_secs: The number of seconds to hop when computing the sliding windows.
+    ??
     eval_split_fraction: Fraction of the dataset to reserve for eval split. If
       set to 0, no eval split is created.
     chunk_secs: Chunk size in seconds used to split the input audio
       files. This is used to split large audio files into manageable chunks for
       better parallelization and to enable non-overlapping train/eval splits.
+      ??
     center: Provide zero-padding to audio so that frame timestamps will be
       centered.
     viterbi: Use viterbi decoding of pitch.
