@@ -97,6 +97,7 @@ def _add_f0_estimate(ex, frame_rate, center, viterbi):
     beam.metrics.Metrics.counter('prepare-tfrecord', 'estimate-f0').inc()
     audio = ex['audio_16k']
     padding = 'center' if center else 'same'
+    print(f"Estimating f0")
     f0_hz, f0_confidence = spectral_ops.compute_f0(
         audio, frame_rate, viterbi=viterbi, padding=padding)
     print(f"f0 estimate from CREPE: {f0_hz}")
@@ -116,6 +117,7 @@ def _add_loudness(ex, frame_rate, n_fft, center):
     beam.metrics.Metrics.counter('prepare-tfrecord', 'compute-loudness').inc()
     audio = ex['audio_16k']
     padding = 'center' if center else 'same'
+    print(f"Estimating loudness")
     loudness_db = spectral_ops.compute_loudness(
         audio, CREPE_SAMPLE_RATE, frame_rate, n_fft, padding=padding)
     print(f"loudness_db: {loudness_db}")
