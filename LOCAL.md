@@ -137,6 +137,11 @@ sudo apt-get install --no-install-recommends libnvinfer6=6.0.1-1+cuda10.1 \
 
 
 
+
+
+
+
+
 # GCP
 ```shell
 sudo su
@@ -146,6 +151,7 @@ git clone <ddsp>
 apt-get install git
 apt-get install wget
 # install miniconda
+
 sudo apt-get install libsndfile-dev
 pip install --upgrade pip
 pip install --upgrade ddsp
@@ -158,8 +164,9 @@ pip install tensorflow==2.11.0rc0
 pip install apache-beam
 
 sudo apt install ffmpeg
+```
 
-# data prep
+## data prep
 ddsp_prepare_tfrecord \
 --input_audio_filepatterns='/root/bucket/*wav' \
 --output_tfrecord_path=/root/tfrecord/train.tfrecord \
@@ -173,10 +180,11 @@ python /root/ddsp/ddsp/training/data_preparation/ddsp_prepare_tfrecord.py \
 --num_shards=10 \
 --alsologtostderr
 
-# just download tfrecords from wisteria to test ddsp_run
+### just download tfrecords from wisteria to test ddsp_run
 rsync -av w:/work/gk77/k77021/data/ddsp/monophonic "/Users/pratik/data/ddsp_tfrecords"
 
 
+## ddsp_run locally
 ddsp_run \
   --mode=train \
   --save_dir=/root/ddsp/save_dir \
@@ -190,10 +198,10 @@ ddsp_run \
 gcloud compute ssh instance-1 --zone us-east1-b --command "sudo expand-root.sh /dev/sda 1 ext4"
 
 wget https://developer.download.nvidia.com/compute/cuda/repos/debian11/x86_64/cuda-keyring_1.0-1_all.deb
-```
 
+## ddsp_run on AI Platform
 
-## Image build and push
+### Image build and push
 cd /root/ddsp/ddsp/training/docker
 
 export PROJECT_ID=ddsp-366504
@@ -206,7 +214,7 @@ export IMAGE_URI=gcr.io/$PROJECT_ID/$IMAGE_REPO_NAME:$IMAGE_TAG
 docker build -f Dockerfile -t $IMAGE_URI ./
 docker push $IMAGE_URI
 
-## Submit job
+### Submit job
 
 export SAVE_DIR=gs://pratik-ddsp-models
 export FILE_PATTERN=gs://pratik-ddsp-tfrecord/train.tfrecord*

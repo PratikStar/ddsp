@@ -95,6 +95,10 @@ def _add_f0_estimate(ex, frame_rate, center, viterbi):
     padding = 'center' if center else 'same'
     f0_hz, f0_confidence = spectral_ops.compute_f0(
         audio, frame_rate, viterbi=viterbi, padding=padding)
+    print(f"f0 estimate from CREPE: {f0_hz}")
+    print(f"f0 estimate from CREPE shape: {f0_hz.shape}")
+    print(f"f0 confidence from CREPE: {f0_confidence}")
+
     ex = dict(ex)
     ex.update({
         'f0_hz': f0_hz.astype(np.float32),
@@ -110,6 +114,8 @@ def _add_loudness(ex, frame_rate, n_fft, center):
     padding = 'center' if center else 'same'
     loudness_db = spectral_ops.compute_loudness(
         audio, CREPE_SAMPLE_RATE, frame_rate, n_fft, padding=padding)
+    print(f"loudness_db: {loudness_db}")
+
     ex = dict(ex)
     ex['loudness_db'] = loudness_db.numpy().astype(np.float32)
     return ex
@@ -187,34 +193,33 @@ def prepare_tfrecord(input_audio_paths,
     """Prepares a TFRecord for use in training, evaluation, and prediction.
 
   Args:
-	input_audio_paths: An iterable of paths to audio files to include in
-	  TFRecord.
-	output_tfrecord_path: The prefix path to the output TFRecord. Shard numbers
-	  will be added to actual path(s).
-	num_shards: The number of shards to use for the TFRecord. If None, this
-	  number will be determined automatically.
-	  ??
-	sample_rate: The sample rate to use for the audio.
-	THE DESIRED SAMPLE RATE!!
-	frame_rate: The frame rate to use for f0 and loudness features. If set to
-	  None, these features will not be computed.
-	  ??
-	example_secs: The size of the sliding window (in seconds) to use to split
-	  the audio and features. If 0, they will not be split.
-	  ??
-	hop_secs: The number of seconds to hop when computing the sliding windows.
-	??
-	eval_split_fraction: Fraction of the dataset to reserve for eval split. If
-	  set to 0, no eval split is created.
-	chunk_secs: Chunk size in seconds used to split the input audio
-	  files. This is used to split large audio files into manageable chunks for
-	  better parallelization and to enable non-overlapping train/eval splits.
-	  ??
-	center: Provide zero-padding to audio so that frame timestamps will be
-	  centered.
-	viterbi: Use viterbi decoding of pitch.
-	pipeline_options: An iterable of command line arguments to be used as
-	  options for the Beam Pipeline.
+    input_audio_paths: An iterable of paths to audio files to include in TFRecord.
+        output_tfrecord_path: The prefix path to the output TFRecord. Shard numbers
+        will be added to actual path(s).
+    num_shards: The number of shards to use for the TFRecord. If None, this
+        number will be determined automatically.
+        ??
+    sample_rate: The sample rate to use for the audio.
+
+    frame_rate: The frame rate to use for f0 and loudness features. If set to
+      None, these features will not be computed.
+      ??
+    example_secs: The size of the sliding window (in seconds) to use to split
+      the audio and features. If 0, they will not be split.
+      ??
+    hop_secs: The number of seconds to hop when computing the sliding windows.
+    ??
+    eval_split_fraction: Fraction of the dataset to reserve for eval split. If
+      set to 0, no eval split is created.
+    chunk_secs: Chunk size in seconds used to split the input audio
+      files. This is used to split large audio files into manageable chunks for
+      better parallelization and to enable non-overlapping train/eval splits.
+      ??
+    center: Provide zero-padding to audio so that frame timestamps will be
+      centered.
+    viterbi: Use viterbi decoding of pitch.
+    pipeline_options: An iterable of command line arguments to be used as
+      options for the Beam Pipeline.
   """
 
     def postprocess_pipeline(examples, output_path, stage_name=''):
