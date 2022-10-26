@@ -23,11 +23,7 @@ RUN pip install --upgrade pip && \
 RUN pip install cloudml-hypertune
 
 WORKDIR /root
-# Installs Magenta DDSP from Github.
-# RUN wget https://github.com//magenta/ddsp/archive/main.zip && \
-#     unzip main.zip && \
-#     cd ddsp-main && \
-#     python setup.py install
+
 RUN pip install ddsp
 # Copies running script.
 COPY task.py task.py

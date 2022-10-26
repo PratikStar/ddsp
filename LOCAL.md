@@ -186,7 +186,11 @@ wget https://developer.download.nvidia.com/compute/cuda/repos/debian11/x86_64/cu
 ```
 
 
-export PROJECT_ID=ddsp
+export PROJECT_ID=ddsp-366504
 export IMAGE_REPO_NAME=ddsp_train
 export IMAGE_TAG=ai_platform
 export IMAGE_URI=gcr.io/$PROJECT_ID/$IMAGE_REPO_NAME:$IMAGE_TAG
+
+
+
+# https://stackoverflow.com/questions/55446787/permission-issues-while-docker-push
