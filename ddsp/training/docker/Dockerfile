@@ -14,10 +14,18 @@ RUN apt-key adv --fetch-keys https://developer.download.nvidia.com/compute/machi
 RUN apt-get update && \
     apt-get install --no-install-recommends -y libsndfile-dev
 
+# Error: NotImplementedError: unable to open file: libtensorflow_io.so, from paths: ['/opt/conda/lib/python3.7/site-packages/tensorflow_io/core/python/ops/libtensorflow_io.so']
+# https://stackoverflow.com/questions/65623468/unable-to-open-file-libtensorflow-io-so-caused-by-undefined-symbol
+RUN pip uninstall tensorflow
+RUN pip uninstall tensorflow-io
+
 # Upgrades Tensorflow and Tensorflow Probability
 # Newer version of Tensorflow is needed for multiple VMs training
 RUN pip install --upgrade pip && \
     pip install --upgrade tensorflow==2.11.0rc0 tensorflow-probability
+
+RUN pip install --no-deps tensorflow-io
+
 
 # Installs cloudml-hypertune package needed for hyperparameter tuning
 RUN pip install cloudml-hypertune

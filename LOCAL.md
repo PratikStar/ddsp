@@ -202,10 +202,10 @@ export IMAGE_URI=gcr.io/$PROJECT_ID/$IMAGE_REPO_NAME:$IMAGE_TAG
 export SAVE_DIR=gs://pratik-ddsp-models
 export FILE_PATTERN=gs://pratik-ddsp-tfrecord/train.tfrecord*
 export REGION=us-east1
-export JOB_NAME=ddsp_container_job_$(date +%Y%m%d_%H%M%S)
 
 cd /root/ddsp/ddsp/training/docker
 
+export JOB_NAME=ddsp_container_job_$(date +%Y%m%d_%H%M%S)
 gcloud ai-platform jobs submit training $JOB_NAME \
   --region $REGION \
   --config config_single_vm.yaml \
