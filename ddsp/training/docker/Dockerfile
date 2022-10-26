@@ -2,6 +2,14 @@
 # You can try using different images however only this one has been tested.
 FROM gcr.io/deeplearning-platform-release/tf2-gpu.2-2
 
+RUN curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add -
+
+RUN rm /etc/apt/sources.list.d/cuda.list
+RUN rm /etc/apt/sources.list.d/nvidia-ml.list
+RUN apt-key del 7fa2af80
+RUN apt-key adv --fetch-keys https://developer.download.nvidia.com/compute/cuda/repos/ubuntu1804/x86_64/3bf863cc.pub
+RUN apt-key adv --fetch-keys https://developer.download.nvidia.com/compute/machine-learning/repos/ubuntu1804/x86_64/7fa2af80.pub
+
 # Installs sndfile library for reading and writing audio files.
 RUN apt-get update && \
     apt-get install --no-install-recommends -y libsndfile-dev
@@ -16,11 +24,11 @@ RUN pip install cloudml-hypertune
 
 WORKDIR /root
 # Installs Magenta DDSP from Github.
-RUN wget https://github.com//magenta/ddsp/archive/main.zip && \
-    unzip main.zip && \
-    cd ddsp-main && \
-    python setup.py install
-
+# RUN wget https://github.com//magenta/ddsp/archive/main.zip && \
+#     unzip main.zip && \
+#     cd ddsp-main && \
+#     python setup.py install
+RUN pip install ddsp
 # Copies running script.
 COPY task.py task.py
 
