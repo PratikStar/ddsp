@@ -12,19 +12,17 @@ sample_rate = 16000
 ### ###
 
 
-print(f"Loading file: {audio_file_path}")
+print(f"Loading & modifying the file: {audio_file_path}")
 
-audio = AudioSegment.from_wav(audio_file_path).set_channels(1)
+sound = AudioSegment.from_wav(audio_file_path).set_channels(1).set_frame_rate(sample_rate).get_array_of_samples()
 
+print(f"Number of channels: {sound.channels}")
+print(f"Duration in seconds: {sound.duration_seconds}")
+print(f"frame_rate: {sound.frame_rate}")
 
-audio = audio_bytes_to_np(audio,
-                                 sample_rate=sample_rate,
-                                 normalize_db=None)
-
-
-if len(audio.shape) == 1:
-  audio = audio[np.newaxis, :]
+if len(sound.shape) == 1:
+  sound = sound[np.newaxis, :]
 
 print('\nExtracting audio features...')
 
-print(audio.shape)
+print(sound.shape)
