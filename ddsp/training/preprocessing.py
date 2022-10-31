@@ -74,6 +74,7 @@ class F0LoudnessPreprocessor(nn.DictLayer):
   def call(self, loudness_db, f0_hz, audio=None) -> [
       'f0_hz', 'loudness_db', 'f0_scaled', 'ld_scaled']:
     # Compute loudness fresh (it's fast).
+    print(f"F0LoudnessPreprocessor.call")
     if self.compute_loudness:
       loudness_db = ddsp.spectral_ops.compute_loudness(
           audio,

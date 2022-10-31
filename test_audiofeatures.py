@@ -5,6 +5,7 @@ from pathlib import Path
 
 import numpy as np
 import ddsp
+import ddsp.training
 
 
 audio_file_path = sys.argv[1]
@@ -44,6 +45,5 @@ if len(audio.shape) == 1:
 print('\nExtracting audio features...')
 
 ddsp.spectral_ops.reset_crepe()
-
 
 audio_features = ddsp.training.metrics.compute_audio_features(audio)

@@ -228,6 +228,19 @@ ddsp_run \
   --alsologtostderr >> ~/logs/data_run_$(date +%Y%m%d_%H%M%S).log 2>&1 &
 
 
+
+python /root/ddsp/ddsp/training/ddsp_run \
+  --mode=train \
+  --save_dir=/root/save_dir_tmp \
+  --gin_file=/root/ddsp/ddsp/training/gin/models/ae.gin \
+  --gin_file=/root/ddsp/ddsp/training/gin/datasets/tfrecord.gin \
+  --gin_file=/root/ddsp/ddsp/training/gin/eval/basic_f0_ld.gin \
+  --gin_param="TFRecordProvider.file_pattern='/root/tfrecord/train.tfrecord*'" \
+  --gin_param="batch_size=16" \
+  --alsologtostderr 
+
+
+
 gcloud compute ssh instance-1 --zone us-east1-b --command "sudo expand-root.sh /dev/sda 1 ext4"
 
 wget https://developer.download.nvidia.com/compute/cuda/repos/debian11/x86_64/cuda-keyring_1.0-1_all.deb
