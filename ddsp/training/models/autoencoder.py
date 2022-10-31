@@ -37,6 +37,7 @@ class Autoencoder(Model):
 
   def encode(self, features, training=True):
     """Get conditioning by preprocessing then encoding."""
+    print(f"Autoencoder.encode")
     if self.preprocessor is not None:
       features.update(self.preprocessor(features, training=training))
     if self.encoder is not None:

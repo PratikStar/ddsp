@@ -5,6 +5,9 @@
 import ddsp
 import ddsp.training
 
+
+
+
 # =====
 # Model
 # =====
@@ -32,6 +35,9 @@ RnnFcDecoder.output_splits = (('amps', 1),
                               ('harmonic_distribution', 100),
                               ('noise_magnitudes', 65))
 
+
+
+
 # Losses
 Autoencoder.losses = [
     @losses.SpectralLoss(),
@@ -39,6 +45,9 @@ Autoencoder.losses = [
 SpectralLoss.loss_type = 'L1'
 SpectralLoss.mag_weight = 1.0
 SpectralLoss.logmag_weight = 1.0
+
+
+
 
 # ==============
 # ProcessorGroup
