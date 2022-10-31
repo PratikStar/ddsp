@@ -98,6 +98,7 @@ def _add_f0_estimate(ex, frame_rate, center, viterbi):
     audio = ex['audio_16k']
     padding = 'center' if center else 'same'
     print(f"Estimating f0")
+    print(f"Audio frame_count: {audio.frame_count()}")
     f0_hz, f0_confidence = spectral_ops.compute_f0(
         audio, frame_rate, viterbi=viterbi, padding=padding)
     print(f"f0 estimate from CREPE: {f0_hz}")
