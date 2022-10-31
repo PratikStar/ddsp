@@ -12,6 +12,13 @@ ddsp_run \
   --alsologtostderr
 ```
 
+### repo. local --> wisteria
+```shell
+cd ~/repos/ddsp
+watch -d -n5 "rsync -av --exclude-from=\".rsyncignore_upload\" \"/Users/pratik/repos/ddsp\" w:/work/gk77/k77021/repos"
+```
+
+
 
 # Local. Install tensorflow on mac m1
 https://developer.apple.com/metal/tensorflow-plugin/
@@ -150,35 +157,49 @@ git clone <ddsp>
 
 apt-get install git
 apt-get install wget
-# install miniconda
+# install miniconda: https://docs.conda.io/projects/conda/en/latest/user-guide/install/linux.html
+wget https://repo.anaconda.com/miniconda/Miniconda3-py39_4.12.0-Linux-x86_64.sh
+bash Miniconda3.....
+source /root/.bashrc
 
 sudo apt-get install libsndfile-dev
+pip install tensorflow==2.11.0rc0
+pip install apache-beam
 pip install --upgrade pip
 pip install --upgrade ddsp
 
 gcsfuse --> https://medium.com/google-cloud/scheduled-mirror-sync-sftp-to-gcs-b167d0eb487a
+gsutil -> https://hartwigmedical.github.io/documentation/accessing-hartwig-data-through-gcp.html#accessing-data
+mkdir ~/bucket ~/bucket-tfrecord
 gcsfuse pratik-ddsp-data ~/bucket
 gcsfuse pratik-ddsp-tfrecord ~/bucket-tfrecord
+OR
+gsutil -u ddsp-366504 cp -r gs://pratik-ddsp-data ~/buckets
 
-pip install tensorflow==2.11.0rc0
-pip install apache-beam
 
 sudo apt install ffmpeg
+
+# install docker. IFF not already installed
+
 ```
 
 ## data prep
+
+
 ddsp_prepare_tfrecord \
---input_audio_filepatterns='/root/bucket/*wav' \
+--input_audio_filepatterns='/root/buckets/pratik-ddsp-data/monophonic/*wav' \
 --output_tfrecord_path=/root/tfrecord/train.tfrecord \
+--chunk_secs=0.0 \
 --num_shards=10 \
 --alsologtostderr
 
 
 python /root/ddsp/ddsp/training/data_preparation/ddsp_prepare_tfrecord.py \
---input_audio_filepatterns='/root/bucket/*wav' \
---output_tfrecord_path=/root/tfrecord_python/train.tfrecord \
+--input_audio_filepatterns='/root/buckets/pratik-ddsp-data/monophonic/*wav' \
+--output_tfrecord_path=/root/tfrecord/train.tfrecord \
+--chunk_secs=0.0 \
 --num_shards=10 \
---alsologtostderr
+--alsologtostderr >> ~/logs/data_prep_$(date +%Y%m%d_%H%M%S).log 2>&1 &
 
 ### just download tfrecords from wisteria to test ddsp_run
 rsync -av w:/work/gk77/k77021/data/ddsp/monophonic "/Users/pratik/data/ddsp_tfrecords"
@@ -187,14 +208,26 @@ rsync -av w:/work/gk77/k77021/data/ddsp/monophonic "/Users/pratik/data/ddsp_tfre
 ## ddsp_run locally
 ddsp_run \
   --mode=train \
-  --save_dir=/root/ddsp/save_dir \
+  --save_dir=/root/save_dir \
   --gin_file=/root/ddsp/ddsp/training/gin/models/solo_instrument.gin \
   --gin_file=/root/ddsp/ddsp/training/gin/datasets/tfrecord.gin \
   --gin_file=/root/ddsp/ddsp/training/gin/eval/basic_f0_ld.gin \
-  --gin_param="TFRecordProvider.file_pattern='/root/bucket-tfrecord/train.tfrecord*'" \
+  --gin_param="TFRecordProvider.file_pattern='/root/tfrecord/train.tfrecord*'" \
   --gin_param="batch_size=16" \
-  --alsologtostderr
+  --alsologtostderr >> ~/logs/data_run_$(date +%Y%m%d_%H%M%S).log 2>&1 &
   
+
+ddsp_run \
+  --mode=train \
+  --save_dir=/root/save_dir_ae \
+  --gin_file=/root/ddsp/ddsp/training/gin/models/ae.gin \
+  --gin_file=/root/ddsp/ddsp/training/gin/datasets/tfrecord.gin \
+  --gin_file=/root/ddsp/ddsp/training/gin/eval/basic_f0_ld.gin \
+  --gin_param="TFRecordProvider.file_pattern='/root/tfrecord/train.tfrecord*'" \
+  --gin_param="batch_size=16" \
+  --alsologtostderr >> ~/logs/data_run_$(date +%Y%m%d_%H%M%S).log 2>&1 &
+
+
 gcloud compute ssh instance-1 --zone us-east1-b --command "sudo expand-root.sh /dev/sda 1 ext4"
 
 wget https://developer.download.nvidia.com/compute/cuda/repos/debian11/x86_64/cuda-keyring_1.0-1_all.deb
@@ -209,7 +242,8 @@ export IMAGE_REPO_NAME=ddsp_train
 export IMAGE_TAG=ai_platform
 export IMAGE_URI=gcr.io/$PROJECT_ID/$IMAGE_REPO_NAME:$IMAGE_TAG
 
-[//]: #(https://stackoverflow.com/questions/55446787/permission-issues-while-docker-push) 
+[//]: #(https://stackoverflow.com/questions/55446787/permission-issues-while-docker-push)
+[comment]: <> (https://docs.docker.com/engine/install/debian/#install-using-the-repository)
 
 docker build -f Dockerfile -t $IMAGE_URI ./
 docker push $IMAGE_URI
@@ -239,3 +273,85 @@ gcloud ai-platform jobs submit training $JOB_NAME \
 gcloud ai-platform jobs list
 
 [comment]: <> (https://console.cloud.google.com/ai-platform/jobs?authuser=1&project=ddsp-366504)
+
+
+### tensorboard
+[comment]: <> (https://www.montefischer.com/2020/02/20/tensorboard-with-gcp.html)
+
+1. start tensorboard
+tensorboard --logdir save_dir/ &
+
+2. port forwarding
+gcloud compute ssh --zone us-east1-c instance-gpu -- -NfL 6006:localhost:6006
+
+go to localhost:6006
+for reference. for ssh
+gcloud compute ssh --zone us-east1-c instance-gpu
+
+
+### Colab x GCE
+dont follow this article though
+[comment]: <> (https://medium.com/@senthilnathangautham/colab-gcp-compute-how-to-link-them-together-98747e8d940e)
+
+```shell
+
+# SSH to the instance and sudo su
+gcloud compute ssh --zone us-east1-c instance-gpu
+sudo su
+cd
+
+# Start jupyter notebook server
+jupyter notebook \
+--no-browser \
+--NotebookApp.answer_yes=True \
+--log-level=DEBUG \
+--NotebookApp.allow_origin='https://colab.research.google.com' \
+--port=8888 \
+--ServerApp.port_retries=0 \
+--ip=0.0.0.0 \
+--allow-root >> ~/tmp/colab_$(date +%Y%m%d_%H%M%S).log 2>&1 &
+
+gcloud compute ssh --zone us-east1-c instance-gpu -- -NfvL 8888:instance-gpu:8888
+
+# Copy the URL from the jupyter notebook command 
+# Open Colan and Connet to local runtime and use the copied URL from the first step.
+
+```
+
+### Upload to wandb
+```shell
+WANDB_PROJECT=ddsp wandb artifact put -t model save_dir_ae/ckpt-45000.index
+WANDB_PROJECT=ddsp wandb artifact put -t model save_dir_ae/ckpt-45000.data-00000-of-00001
+WANDB_PROJECT=ddsp wandb artifact put save_dir_ae/operative_config-0.gin
+
+```
+
+#### Note
+```shell
+======================================
+Welcome to the Google Deep Learning VM
+======================================
+
+Version: common-cu113.m98
+Based on: Debian GNU/Linux 10 (buster) (GNU/Linux 4.19.0-21-cloud-amd64 x86_64\n)
+
+Resources:
+ * Google Deep Learning Platform StackOverflow: https://stackoverflow.com/questions/tagged/google-dl-platform
+ * Google Cloud Documentation: https://cloud.google.com/deep-learning-vm
+ * Google Group: https://groups.google.com/forum/#!forum/google-dl-platform
+
+To reinstall Nvidia driver (if needed) run:
+sudo /opt/deeplearning/install-driver.sh
+Linux instance-gpu-2 4.19.0-21-cloud-amd64 #1 SMP Debian 4.19.249-2 (2022-06-30) x86_64
+
+The programs included with the Debian GNU/Linux system are free software;
+the exact distribution terms for each program are described in the
+individual files in /usr/share/doc/*/copyright.
+
+Debian GNU/Linux comes with ABSOLUTELY NO WARRANTY, to the extent
+permitted by applicable law.
+
+This VM requires Nvidia drivers to function correctly.   Installation takes ~1 minute.
+```
+
+#### NVIDIA-SMI has failed because it couldn't communicate with the NVIDIA driver. Make sure that the latest NVIDIA driver is installed and running.
