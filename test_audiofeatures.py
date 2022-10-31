@@ -4,7 +4,7 @@ import os
 from pathlib import Path
 
 import numpy as np
-from .ddsp.colab.colab_utils import audio_bytes_to_np
+from ddsp.colab.colab_utils import audio_bytes_to_np
 
 audio_file_path = sys.argv[1]
 sample_rate = 16000
