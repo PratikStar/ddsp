@@ -14,11 +14,14 @@ sample_rate = 16000
 
 print(f"Loading & modifying the file: {audio_file_path}")
 
-sound = AudioSegment.from_wav(audio_file_path).set_channels(1).set_frame_rate(sample_rate).get_array_of_samples()
+sound = AudioSegment.from_wav(audio_file_path)
 
 print(f"Number of channels: {sound.channels}")
 print(f"Duration in seconds: {sound.duration_seconds}")
 print(f"frame_rate: {sound.frame_rate}")
+
+
+sound = sound.set_channels(1).set_frame_rate(sample_rate).get_array_of_samples()
 
 if len(sound.shape) == 1:
   sound = sound[np.newaxis, :]
