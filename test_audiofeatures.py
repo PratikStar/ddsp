@@ -4,7 +4,8 @@ import os
 from pathlib import Path
 
 import numpy as np
-from ddsp.colab.colab_utils import audio_bytes_to_np
+import ddsp
+
 
 audio_file_path = sys.argv[1]
 sample_rate = 16000
@@ -29,16 +30,20 @@ print(f"new frame_rate: {sound.frame_rate}")
 # Convert to numpy array.
 channel_asegs = sound.split_to_mono()
 samples = [s.get_array_of_samples() for s in channel_asegs]
-fp_arr = np.array(samples).astype(np.float32)
-fp_arr /= np.iinfo(samples[0].typecode).max
+audio = np.array(samples).astype(np.float32)
+audio /= np.iinfo(samples[0].typecode).max
 
 # If only 1 channel, remove extra dim.
-if fp_arr.shape[0] == 1:
-  fp_arr = fp_arr[0]
+if audio.shape[0] == 1:
+  audio = audio[0]
 
 
-if len(fp_arr.shape) == 1:
-  sound = sound[np.newaxis, :]
+if len(audio.shape) == 1:
+  audio = audio[np.newaxis, :]
 
 print('\nExtracting audio features...')
 
+ddsp.spectral_ops.reset_crepe()
+
+
+audio_features = ddsp.training.metrics.compute_audio_features(audio)
