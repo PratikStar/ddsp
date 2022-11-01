@@ -76,12 +76,15 @@ class F0LoudnessPreprocessor(nn.DictLayer):
       'f0_hz', 'loudness_db', 'f0_scaled', 'ld_scaled']:
     # Compute loudness fresh (it's fast).
     print(f"F0LoudnessPreprocessor.call")
+
     if self.compute_loudness:
       print("computing loudness")
       loudness_db = ddsp.spectral_ops.compute_loudness(
           audio,
           sample_rate=self.sample_rate,
           frame_rate=self.frame_rate)
+
+        
     print(f"f0_hz: {f0_hz.numpy().shape}")
     print(f"loudness_db: {loudness_db.numpy().shape}")
     # Resample features to the frame_rate.

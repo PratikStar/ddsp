@@ -40,6 +40,12 @@ class Autoencoder(Model):
     """Get conditioning by preprocessing then encoding."""
     print(f"Autoencoder.encode")
     print(f"features type: {type(features)}")
+    print(f"features type: {type(features)}")
+    for k, v in features.items():
+      print(f"key: {k}")
+      print(f"value type: {type(v)} ")
+      print(f"v: {v}")
+
     if self.preprocessor is not None:
       features.update(self.preprocessor(features, training=training))
     if self.encoder is not None:
@@ -49,7 +55,7 @@ class Autoencoder(Model):
   def decode(self, features, training=True):
     """Get generated audio by decoding than processing."""
     print(f"Autoencoder.decode")
-    print(f"features type: {type(features)}")
+
     features.update(self.decoder(features, training=training))
     return self.processor_group(features)
 
