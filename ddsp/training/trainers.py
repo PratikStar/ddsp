@@ -153,7 +153,9 @@ class Trainer(object):
   def train_step(self, inputs):
     """Distributed training step."""
     # Wrap iterator in tf.function, slight speedup passing in iter vs batch.
+    print("Inside train_step")
     batch = next(inputs) if hasattr(inputs, '__next__') else inputs
+    print(f"this is the batch: {batch}")
     losses = self.run(self.step_fn, batch)
     # Add up the scalar losses across replicas.
     n_replicas = self.strategy.num_replicas_in_sync
@@ -162,6 +164,7 @@ class Trainer(object):
   @tf.function
   def step_fn(self, batch):
     """Per-Replica training step."""
+    print("Inside the step_fn")
     with tf.GradientTape() as tape:
       _, losses = self.model(batch, return_losses=True, training=True)
     # Clip and apply gradients.

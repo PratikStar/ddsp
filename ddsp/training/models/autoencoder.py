@@ -39,12 +39,9 @@ class Autoencoder(Model):
   def encode(self, features, training=True):
     """Get conditioning by preprocessing then encoding."""
     print(f"Autoencoder.encode")
-    print(f"features type: {type(features)}")
-    print(f"features type: {type(features)}")
+    print(f"features are as below: {type(features)}")
     for k, v in features.items():
-      print(f"key: {k}")
-      print(f"value type: {type(v)} ")
-      print(f"v: {v}")
+      print(f": {k} --> {v}")
 
     if self.preprocessor is not None:
       features.update(self.preprocessor(features, training=training))

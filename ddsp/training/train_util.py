@@ -238,6 +238,15 @@ def train(data_provider,
    report_loss_to_hypertune: Report loss values to hypertune package for
      hyperparameter tuning, such as on Google Cloud AI-Platform.
   """
+  print(f"train_util.train")
+
+  print(f"batch_size: {batch_size}")
+  print(f"num_steps: {num_steps}")
+  print(f"steps_per_summary: {steps_per_summary}")
+  print(f"steps_per_save: {steps_per_save}")
+  print(f"early_stop_loss_value: {early_stop_loss_value}")
+
+  print("Getting dataset")
   # Get a distributed dataset iterator.
   dataset = data_provider.get_batch(batch_size, shuffle=True, repeats=-1)
   dataset = trainer.distribute_dataset(dataset)
@@ -249,6 +258,7 @@ def train(data_provider,
 
   # Load latest checkpoint if one exists in load directory.
   try:
+    print("Restoraing the checkpoint if available")
     trainer.restore(restore_dir)
   except FileNotFoundError:
     logging.info('No existing checkpoint found in %s, skipping '
@@ -272,9 +282,11 @@ def train(data_provider,
     first_step = True
 
     while trainer.step < num_steps:
+      print(f"This is {trainer.step} step")
       step = trainer.step
 
       # Take a step.
+      print("Taking a step")
       losses = trainer.train_step(dataset_iter)
 
       # Create training loss metrics when starting/restarting training.
