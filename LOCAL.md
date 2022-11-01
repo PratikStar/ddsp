@@ -229,7 +229,7 @@ ddsp_run \
 
 
 
-python /root/ddsp/ddsp/training/ddsp_run \
+ddsp_run \
   --mode=train \
   --save_dir=/root/save_dir_tmp \
   --gin_file=/root/ddsp/ddsp/training/gin/models/ae.gin \
@@ -368,3 +368,136 @@ This VM requires Nvidia drivers to function correctly.   Installation takes ~1 m
 ```
 
 #### NVIDIA-SMI has failed because it couldn't communicate with the NVIDIA driver. Make sure that the latest NVIDIA driver is installed and running.
+
+
+
+
+
+
+```shell
+I1031 09:49:25.585731 139929154720000 ddsp_run.py:179] Restore Dir: /root/save_dir_tmp
+I1031 09:49:25.586658 139929154720000 ddsp_run.py:180] Save Dir: /root/save_dir_tmp
+I1031 09:49:25.587098 139929154720000 resource_reader.py:50] system_path_file_exists:optimization/base.gin
+E1031 09:49:25.587472 139929154720000 resource_reader.py:55] Path not found: optimization/base.gin
+I1031 09:49:25.590388 139929154720000 resource_reader.py:50] system_path_file_exists:eval/basic.gin
+E1031 09:49:25.590616 139929154720000 resource_reader.py:55] Path not found: eval/basic.gin
+I1031 09:49:25.593094 139929154720000 ddsp_run.py:152] Operative config not found in /root/save_dir_tmp
+I1031 09:49:25.597534 139929154720000 resource_reader.py:50] system_path_file_exists:datasets/base.gin
+E1031 09:49:25.597746 139929154720000 resource_reader.py:55] Path not found: datasets/base.gin
+I1031 09:49:25.605808 139929154720000 ddsp_run.py:184] Operative Gin Config:
+import ddsp
+import ddsp.training as ddsp2
+
+# Macros:
+# ==============================================================================
+batch_size = 16
+evaluators = [@BasicEvaluator, @F0LdEvaluator]
+learning_rate = 0.0003
+
+# Parameters for processors.Add:
+# ==============================================================================
+processors.Add.name = 'add'
+
+# Parameters for Autoencoder:
+# ==============================================================================
+Autoencoder.decoder = @decoders.RnnFcDecoder()
+Autoencoder.encoder = @encoders.MfccTimeDistributedRnnEncoder()
+Autoencoder.losses = [@losses.SpectralLoss()]
+Autoencoder.preprocessor = @preprocessing.F0LoudnessPreprocessor()
+Autoencoder.processor_group = @processors.ProcessorGroup()
+
+# Parameters for evaluate:
+# ==============================================================================
+evaluate.batch_size = 32
+evaluate.data_provider = @data.TFRecordProvider()
+evaluate.evaluator_classes = %evaluators
+evaluate.num_batches = 5
+
+# Parameters for F0LoudnessPreprocessor:
+# ==============================================================================
+F0LoudnessPreprocessor.time_steps = 1000
+
+# Parameters for FilteredNoise:
+# ==============================================================================
+FilteredNoise.n_samples = 64000
+FilteredNoise.name = 'filtered_noise'
+FilteredNoise.scale_fn = @core.exp_sigmoid
+FilteredNoise.window_size = 0
+
+# Parameters for get_model:
+# ==============================================================================
+get_model.model = @models.Autoencoder()
+
+# Parameters for Harmonic:
+# ==============================================================================
+Harmonic.n_samples = 64000
+Harmonic.name = 'harmonic'
+Harmonic.normalize_below_nyquist = True
+Harmonic.sample_rate = 16000
+Harmonic.scale_fn = @core.exp_sigmoid
+
+# Parameters for MfccTimeDistributedRnnEncoder:
+# ==============================================================================
+MfccTimeDistributedRnnEncoder.rnn_channels = 512
+MfccTimeDistributedRnnEncoder.rnn_type = 'gru'
+MfccTimeDistributedRnnEncoder.z_dims = 16
+MfccTimeDistributedRnnEncoder.z_time_steps = 125
+
+# Parameters for ProcessorGroup:
+# ==============================================================================
+ProcessorGroup.dag = \
+    [(@synths.Harmonic(), ['amps', 'harmonic_distribution', 'f0_hz']),
+     (@synths.FilteredNoise(), ['noise_magnitudes']),
+     (@processors.Add(), ['filtered_noise/signal', 'harmonic/signal'])]
+
+# Parameters for RnnFcDecoder:
+# ==============================================================================
+RnnFcDecoder.ch = 512
+RnnFcDecoder.input_keys = ('ld_scaled', 'f0_scaled', 'z')
+RnnFcDecoder.layers_per_stack = 3
+RnnFcDecoder.output_splits = \
+    (('amps', 1), ('harmonic_distribution', 100), ('noise_magnitudes', 65))
+RnnFcDecoder.rnn_channels = 512
+RnnFcDecoder.rnn_type = 'gru'
+
+# Parameters for sample:
+# ==============================================================================
+sample.batch_size = 16
+sample.ckpt_delay_secs = 300
+sample.data_provider = @data.TFRecordProvider()
+sample.evaluator_classes = %evaluators
+sample.num_batches = 1
+
+# Parameters for SpectralLoss:
+# ==============================================================================
+SpectralLoss.logmag_weight = 1.0
+SpectralLoss.loss_type = 'L1'
+SpectralLoss.mag_weight = 1.0
+
+# Parameters for TFRecordProvider:
+# ==============================================================================
+TFRecordProvider.file_pattern = '/root/tfrecord/train.tfrecord*'
+
+# Parameters for train:
+# ==============================================================================
+train.batch_size = %batch_size
+train.data_provider = @data.TFRecordProvider()
+train.num_steps = 1000000
+train.steps_per_save = 300
+train.steps_per_summary = 300
+
+# Parameters for Trainer:
+# ==============================================================================
+Trainer.checkpoints_to_keep = 100
+Trainer.grad_clip_norm = 3.0
+Trainer.learning_rate = %learning_rate
+Trainer.lr_decay_rate = 0.98
+Trainer.lr_decay_steps = 10000
+```
+
+# install package from source
+conda create -n test_env python=3.9.12
+conda activate test_env
+
+cd ~/ddsp
+pip install .

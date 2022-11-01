@@ -66,6 +66,7 @@ class F0LoudnessPreprocessor(nn.DictLayer):
                compute_loudness=True,
                **kwargs):
     super().__init__(**kwargs)
+    print("F0LoudnessPreprocessor init")
     self.time_steps = time_steps
     self.frame_rate = frame_rate
     self.sample_rate = sample_rate
@@ -76,16 +77,19 @@ class F0LoudnessPreprocessor(nn.DictLayer):
     # Compute loudness fresh (it's fast).
     print(f"F0LoudnessPreprocessor.call")
     if self.compute_loudness:
+      print("computing loudness")
       loudness_db = ddsp.spectral_ops.compute_loudness(
           audio,
           sample_rate=self.sample_rate,
           frame_rate=self.frame_rate)
-
+    print(f"f0_hz: {f0_hz.numpy().shape}")
+    print(f"loudness_db: {loudness_db.numpy().shape}")
     # Resample features to the frame_rate.
     f0_hz = self.resample(f0_hz)
     loudness_db = self.resample(loudness_db)
     # For NN training, scale frequency and loudness to the range [0, 1].
     # Log-scale f0 features. Loudness from [-1, 0] to [1, 0].
+    print("Scaling to MIDI")
     f0_scaled = scale_f0_hz(f0_hz)
     ld_scaled = scale_db(loudness_db)
     return f0_hz, loudness_db, f0_scaled, ld_scaled

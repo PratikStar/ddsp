@@ -1,3 +1,5 @@
 save_dir.zip
 save_dir
 .idea
+__pycache__
+.eggs
