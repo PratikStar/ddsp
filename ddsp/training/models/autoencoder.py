@@ -29,6 +29,7 @@ class Autoencoder(Model):
                losses=None,
                **kwargs):
     super().__init__(**kwargs)
+    print("Autoencoder initializing")
     self.preprocessor = preprocessor
     self.encoder = encoder
     self.decoder = decoder
@@ -38,6 +39,7 @@ class Autoencoder(Model):
   def encode(self, features, training=True):
     """Get conditioning by preprocessing then encoding."""
     print(f"Autoencoder.encode")
+    print(f"features type: {type(features)}")
     if self.preprocessor is not None:
       features.update(self.preprocessor(features, training=training))
     if self.encoder is not None:
@@ -46,6 +48,8 @@ class Autoencoder(Model):
 
   def decode(self, features, training=True):
     """Get generated audio by decoding than processing."""
+    print(f"Autoencoder.decode")
+    print(f"features type: {type(features)}")
     features.update(self.decoder(features, training=training))
     return self.processor_group(features)
 
@@ -55,9 +59,11 @@ class Autoencoder(Model):
 
   def call(self, features, training=True):
     """Run the core of the network, get predictions and loss."""
+    print(f"Autoencoder.call")
     features = self.encode(features, training=training)
     features.update(self.decoder(features, training=training))
 
+    print(f"Autoencoder, now through processor groups")
     # Run through processor group.
     pg_out = self.processor_group(features, return_outputs_dict=True)
 
