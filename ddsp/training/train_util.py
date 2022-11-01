@@ -243,6 +243,7 @@ def train(data_provider,
   dataset = trainer.distribute_dataset(dataset)
   dataset_iter = iter(dataset)
 
+  print(f"dataset_iter: {dataset_iter}")
   # Build model, easiest to just run forward pass.
   trainer.build(next(dataset_iter))
 
