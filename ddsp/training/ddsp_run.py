@@ -189,8 +189,10 @@ def main(unused_argv):
 
   # Training.
   if FLAGS.mode == 'train':
+    print(f"ddsp_run. this is TRAINING")
     strategy = train_util.get_strategy(tpu=FLAGS.tpu,
                                        cluster_config=FLAGS.cluster_config)
+    print(f"strategy is {strategy}")
     with strategy.scope():
       model = models.get_model()
       trainer = trainers.get_trainer_class()(model, strategy)
