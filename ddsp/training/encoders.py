@@ -34,6 +34,7 @@ class ZEncoder(nn.DictLayer):
   def __init__(self, input_keys=None, **kwargs):
     """Constructor."""
     input_keys = input_keys or self.get_argument_names('compute_z')
+    print(f"ZEncoder __init__, input_keys = {input_keys}")
     super().__init__(input_keys, output_keys=['z'], **kwargs)
 
     # TODO(jesseengel): remove dependence on arbitrary key.
@@ -41,20 +42,32 @@ class ZEncoder(nn.DictLayer):
 
   def call(self, *args, **unused_kwargs):
     """Takes in input tensors and returns a latent tensor z."""
+    print("ZEncoder.call")
+    print(f"All args: {args}")
     time_steps = int(args[-1].shape[1])
+    print(f"time_steps: {time_steps}")
+
     inputs = args[:-1]  # Last input just used for time_steps.
+    print(f"inputs to compute_z: {inputs}")
     z = self.compute_z(*inputs)
     return self.expand_z(z, time_steps)
 
   def expand_z(self, z, time_steps):
     """Make sure z has same temporal resolution as other conditioning."""
+    print("ZEncoder.expand_z")
     # Add time dim of z if necessary.
     if len(z.shape) == 2:
       z = z[:, tf.newaxis, :]
     # Expand time dim of z if necessary.
     z_time_steps = int(z.shape[1])
+    print(f"z_time_steps: {z_time_steps}")
+
     if z_time_steps != time_steps:
+      print("z_time_steps != time_steps. doing ddsp.core.resample")
       z = ddsp.core.resample(z, time_steps)
+
+    print(f"returning from expand_z, new shape is: {z.shape}")
+    print(z)
     return z
 
   def compute_z(self, *inputs):
