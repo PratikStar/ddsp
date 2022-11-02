@@ -43,7 +43,6 @@ class Autoencoder(Model):
     print(f"features are as below: {type(features)}")
     for k, v in features.items():
       print(f": {k} --> {v}")
-      tf.Print(v)
 
     if self.preprocessor is not None:
       features.update(self.preprocessor(features, training=training))
