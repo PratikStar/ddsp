@@ -125,7 +125,22 @@ class MfccTimeDistributedRnnEncoder(ZEncoder):
     z = self.rnn(z)
     # Bounce down to compressed z dimensions.
     z = self.dense_out(z)
+    print(z)
+    # if self.config.timbre_encoder.converge_latent == "first":
+    # print(f"shape of z before: {z.shape}")
+    # z = tf.stack([t[0]] * z.shape[0])
+    # elif self.config.timbre_encoder.converge_latent == "mean":
+    #     z = z.mean(dim=0).repeat(z.shape[0], 1)
+    # elif self.config.timbre_encoder.converge_latent == "max":
+    #     z = z.max(dim=0).values.repeat(z.shape[0], 1)
+    # elif self.config.timbre_encoder.converge_latent == "none":
+    #     pass
+    # else:
+    #     raise Exception("merge_encoding is not valid")
+    # return z
+
     print(f"Returning z: {z}")
+    print(f"shape of z: {z.shape}")
     return z
 
 

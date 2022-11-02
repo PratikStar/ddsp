@@ -64,7 +64,7 @@ class Autoencoder(Model):
 
     features.update(self.decoder(features, training=training))
 
-    print(f"Output features to *decode* are as below: ")
+    print(f"Output features from *decode* are as below: ")
     for k, v in features.items():
       print(f"\t{k} --> {v}")
 
