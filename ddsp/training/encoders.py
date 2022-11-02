@@ -131,13 +131,16 @@ class MfccTimeDistributedRnnEncoder(ZEncoder):
         overlap=self.overlap,
         pad_end=True)
 
-    print(f"mfccs: {mfccs}")
+    print(f"mfccs: {mfccs.shape}")
     # Normalize.
     z = self.z_norm(mfccs[:, :, tf.newaxis, :])[:, :, 0, :]
+    print(f"normalized: {z.shape}")
     # Run an RNN over the latents.
     z = self.rnn(z)
+    print(f"after rnn: {z.shape}")
     # Bounce down to compressed z dimensions.
     z = self.dense_out(z)
+    print(f"after dense out: {z.shape}")
     print(z)
     # if self.config.timbre_encoder.converge_latent == "first":
     # print(f"shape of z before: {z.shape}")
@@ -151,9 +154,7 @@ class MfccTimeDistributedRnnEncoder(ZEncoder):
     # else:
     #     raise Exception("merge_encoding is not valid")
     # return z
-
-    print(f"Returning z: {z}")
-    print(f"shape of z: {z.shape}")
+    print(f"Returning from compute_z: {z}")
     return z
 
 
