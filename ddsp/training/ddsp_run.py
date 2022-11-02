@@ -197,6 +197,7 @@ def main(unused_argv):
       model = models.get_model()
       trainer = trainers.get_trainer_class()(model, strategy)
 
+    print("calling train_util.train")
     train_util.train(data_provider=gin.REQUIRED,
                      trainer=trainer,
                      save_dir=save_dir,

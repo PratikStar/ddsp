@@ -98,6 +98,7 @@ class MfccTimeDistributedRnnEncoder(ZEncoder):
             'overlap': 0.75
         }
     }
+    print(f"In MfccTimeDistributedRnnEncoder.init")
     self.fft_size = self.z_audio_spec[str(z_time_steps)]['fft_size']
     self.overlap = self.z_audio_spec[str(z_time_steps)]['overlap']
 
@@ -117,12 +118,14 @@ class MfccTimeDistributedRnnEncoder(ZEncoder):
         overlap=self.overlap,
         pad_end=True)
 
+    print(f"mfccs: {mfccs}")
     # Normalize.
     z = self.z_norm(mfccs[:, :, tf.newaxis, :])[:, :, 0, :]
     # Run an RNN over the latents.
     z = self.rnn(z)
     # Bounce down to compressed z dimensions.
     z = self.dense_out(z)
+    print(f"Returning z: {z}")
     return z
 
 

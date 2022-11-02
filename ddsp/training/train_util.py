@@ -258,7 +258,7 @@ def train(data_provider,
 
   # Load latest checkpoint if one exists in load directory.
   try:
-    print("Restoraing the checkpoint if available")
+    print("\n\nRestoraing the checkpoint if available")
     trainer.restore(restore_dir)
   except FileNotFoundError:
     logging.info('No existing checkpoint found in %s, skipping '
