@@ -230,14 +230,13 @@ ddsp_run \
 
 ddsp_run \
   --mode=train \
-  --save_dir=/root/save_dir_ae_rnnencoder_mean \
+  --save_dir=/root/save_dir_ae_rnn_mean \
   --gin_file=/root/ddsp/ddsp/training/gin/models/ae_mfccRnnEncoder_mean.gin \
   --gin_file=/root/ddsp/ddsp/training/gin/datasets/tfrecord.gin \
   --gin_file=/root/ddsp/ddsp/training/gin/eval/basic_f0_ld.gin \
   --gin_param="TFRecordProvider.file_pattern='/root/tfrecord/train.tfrecord*'" \
   --gin_param="batch_size=16" \
-  --alsologtostderr 
-> >> ~/logs/data_run_$(date +%Y%m%d_%H%M%S).log 2>&1 &
+  --alsologtostderr >> ~/logs/data_run_$(date +%Y%m%d_%H%M%S).log 2>&1 &
 
 
 

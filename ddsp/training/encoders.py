@@ -73,7 +73,7 @@ class ZEncoder(nn.DictLayer):
     print(f"z[0,1,:]: {z[0,1,:]}")
     print(f"z[0,2,:]: {z[0,2,:]}")
     print(f"z[0,999,:]: {z[0,999,:]}")
-    
+
     print(f"returning from expand_z, new shape is: {z.shape}")
     print(f"shape: {z.shape}")
     return z
