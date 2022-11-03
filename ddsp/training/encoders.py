@@ -115,10 +115,10 @@ class MfccTimeDistributedRnnEncoder(ZEncoder):
     print(f"In MfccTimeDistributedRnnEncoder.init")
     self.fft_size = self.z_audio_spec[str(z_time_steps)]['fft_size']
     self.overlap = self.z_audio_spec[str(z_time_steps)]['overlap']
-
+    self.rnn_return_sequences = rnn_return_sequences
     # Layers.
     self.z_norm = nn.Normalize('instance')
-    self.rnn = nn.Rnn(rnn_channels, rnn_type, return_sequences=rnn_return_sequences)
+    self.rnn = nn.Rnn(rnn_channels, rnn_type, return_sequences=self.rnn_return_sequences)
     self.dense_out = tfkl.Dense(z_dims)
 
   def compute_z(self, audio):
