@@ -44,12 +44,13 @@ class ZEncoder(nn.DictLayer):
     """Takes in input tensors and returns a latent tensor z."""
     print("ZEncoder.call")
     print(f"All args: {args}")
-    time_steps = int(args[-1].shape[1]) # time_steps is basically the height(?) of MFCCs
+    time_steps = int(args[-1].shape[1])
     print(f"time_steps: {time_steps}")
 
     inputs = args[:-1]  # Last input just used for time_steps.
     print(f"inputs to compute_z: {inputs}")
     z = self.compute_z(*inputs)
+    print(f"Returned from compute_z, {z.shape}")
     return self.expand_z(z, time_steps)
 
   def expand_z(self, z, time_steps):
@@ -67,7 +68,7 @@ class ZEncoder(nn.DictLayer):
       z = ddsp.core.resample(z, time_steps)
 
     print(f"returning from expand_z, new shape is: {z.shape}")
-    print(z)
+    print(f"shape: {z.shape}")
     return z
 
   def compute_z(self, *inputs):
@@ -408,7 +409,7 @@ class MfccRnnEncoder(ZEncoder):
             'overlap': 0.75
         }
     }
-    print(f"In MfccTimeDistributedRnnEncoder.init")
+    print(f"In MfccRnnEncoder.init")
     self.fft_size = self.z_audio_spec[str(z_time_steps)]['fft_size']
     self.overlap = self.z_audio_spec[str(z_time_steps)]['overlap']
     # Layers.
@@ -417,6 +418,7 @@ class MfccRnnEncoder(ZEncoder):
     self.dense_z = tfkl.Dense(z_dims)
 
   def compute_z(self, audio):
+    print("In MfccRnnEncoder.compute_z")
     # mfccs = spectral_ops.compute_mfcc(
     #     audio,
     #     lo_hz=20.0,
@@ -433,17 +435,26 @@ class MfccRnnEncoder(ZEncoder):
         mfcc_bins=30,
         overlap=self.overlap,
         pad_end=True)
+    print(f"mfccs: {mfccs.shape}")
     z = self.norm_in(mfccs[:, :, tf.newaxis, :])[:, :, 0, :]
+    print(f"Normalized: {z.shape}")
 
     if self.mean_aggregate:
+      print("mean aggregate is true")
       z = self.rnn(z)
+      print(f"After rnn: {z.shape}")
       z = tf.reduce_mean(z, axis=1, keepdims=True)
+      print(f"After tf.reduce_mean: {z.shape}")
     else:
       z = self.rnn(z)
+      print(f"After rnn: {z.shape}")
       z = tf.concat(z, axis=-1)[:, tf.newaxis, :]
+      print(f"After tf.concat: {z.shape}")
 
     # Bounce down to compressed dimensions.
-    return self.dense_z(z)
+    z = self.dense_z(z)
+    print(f"After dense: {z.shape}")
+    return z
 
 
 @gin.register
