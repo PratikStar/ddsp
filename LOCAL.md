@@ -236,7 +236,7 @@ ddsp_run \
   --gin_file=/root/ddsp/ddsp/training/gin/eval/basic_f0_ld.gin \
   --gin_param="TFRecordProvider.file_pattern='/root/tfrecord/train.tfrecord*'" \
   --gin_param="batch_size=16" \
-  --alsologtostderr >> ~/logs/data_run_$(date +%Y%m%d_%H%M%S).log 2>&1 &
+  --alsologtostderr >> ~/logs/data_run_rnn_mean_$(date +%Y%m%d_%H%M%S).log 2>&1 &
 
 
 
