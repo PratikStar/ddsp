@@ -44,7 +44,7 @@ class ZEncoder(nn.DictLayer):
     """Takes in input tensors and returns a latent tensor z."""
     print("ZEncoder.call")
     print(f"All args: {args}")
-    time_steps = int(args[-1].shape[1])
+    time_steps = int(args[-1].shape[1]) # time_steps is basically the height(?) of MFCCs
     print(f"time_steps: {time_steps}")
 
     inputs = args[:-1]  # Last input just used for time_steps.
@@ -82,6 +82,7 @@ class MfccTimeDistributedRnnEncoder(ZEncoder):
   def __init__(self,
                rnn_channels=512,
                rnn_type='gru',
+               rnn_return_sequences=True,
                z_dims=32,
                z_time_steps=250,
                **kwargs):
@@ -117,7 +118,7 @@ class MfccTimeDistributedRnnEncoder(ZEncoder):
 
     # Layers.
     self.z_norm = nn.Normalize('instance')
-    self.rnn = nn.Rnn(rnn_channels, rnn_type)
+    self.rnn = nn.Rnn(rnn_channels, rnn_type, return_sequences=rnn_return_sequences)
     self.dense_out = tfkl.Dense(z_dims)
 
   def compute_z(self, audio):
