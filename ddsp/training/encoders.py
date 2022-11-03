@@ -56,6 +56,8 @@ class ZEncoder(nn.DictLayer):
   def expand_z(self, z, time_steps):
     """Make sure z has same temporal resolution as other conditioning."""
     print("ZEncoder.expand_z")
+    print(f"z[0,0,:] --> {z[0,0,:]}")
+
     # Add time dim of z if necessary.
     if len(z.shape) == 2:
       z = z[:, tf.newaxis, :]
@@ -67,6 +69,11 @@ class ZEncoder(nn.DictLayer):
       print("z_time_steps != time_steps. doing ddsp.core.resample")
       z = ddsp.core.resample(z, time_steps)
 
+    print(f"z[0,0,:]: {z[0,0,:]}")
+    print(f"z[0,1,:]: {z[0,1,:]}")
+    print(f"z[0,2,:]: {z[0,2,:]}")
+    print(f"z[0,999,:]: {z[0,999,:]}")
+    
     print(f"returning from expand_z, new shape is: {z.shape}")
     print(f"shape: {z.shape}")
     return z
