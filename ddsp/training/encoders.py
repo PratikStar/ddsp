@@ -139,6 +139,9 @@ class MfccTimeDistributedRnnEncoder(ZEncoder):
     # Run an RNN over the latents.
     z = self.rnn(z)
     print(f"after rnn: {z.shape}")
+
+    if not self.rnn_return_sequences:
+      z = z[tf.newaxis, :]
     # Bounce down to compressed z dimensions.
     z = self.dense_out(z)
     print(f"after dense out: {z.shape}")
@@ -376,23 +379,60 @@ class MfccRnnEncoder(ZEncoder):
                rnn_type='gru',
                z_dims=512,
                mean_aggregate=False,
+               z_time_steps=250,
                **kwargs):
     super().__init__(**kwargs)
     self.mean_aggregate = mean_aggregate
-
+    if z_time_steps not in [63, 125, 250, 500, 1000]:
+      raise ValueError(
+          '`z_time_steps` currently limited to 63,125,250,500 and 1000')
+    self.z_audio_spec = {
+        '63': {
+            'fft_size': 2048,
+            'overlap': 0.5
+        },
+        '125': {
+            'fft_size': 1024,
+            'overlap': 0.5
+        },
+        '250': {
+            'fft_size': 1024,
+            'overlap': 0.75
+        },
+        '500': {
+            'fft_size': 512,
+            'overlap': 0.75
+        },
+        '1000': {
+            'fft_size': 256,
+            'overlap': 0.75
+        }
+    }
+    print(f"In MfccTimeDistributedRnnEncoder.init")
+    self.fft_size = self.z_audio_spec[str(z_time_steps)]['fft_size']
+    self.overlap = self.z_audio_spec[str(z_time_steps)]['overlap']
     # Layers.
     self.norm_in = nn.Normalize('instance')
     self.rnn = nn.Rnn(rnn_channels, rnn_type)
     self.dense_z = tfkl.Dense(z_dims)
 
   def compute_z(self, audio):
+    # mfccs = spectral_ops.compute_mfcc(
+    #     audio,
+    #     lo_hz=20.0,
+    #     hi_hz=8000.0,
+    #     fft_size=1024,
+    #     mel_bins=128,
+    #     mfcc_bins=30)
     mfccs = spectral_ops.compute_mfcc(
         audio,
         lo_hz=20.0,
         hi_hz=8000.0,
-        fft_size=1024,
+        fft_size=self.fft_size,
         mel_bins=128,
-        mfcc_bins=30)
+        mfcc_bins=30,
+        overlap=self.overlap,
+        pad_end=True)
     z = self.norm_in(mfccs[:, :, tf.newaxis, :])[:, :, 0, :]
 
     if self.mean_aggregate:
