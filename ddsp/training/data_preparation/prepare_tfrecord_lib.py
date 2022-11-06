@@ -40,18 +40,18 @@ def _load_audio_as_array(audio_path, sample_rate):
     with tf.io.gfile.GFile(audio_path, 'rb') as f:
         # Load audio at original SR
         audio_segment = (pydub.AudioSegment.from_file(f).set_channels(1))
-        print(f"frame_count in original audio: {audio_segment.frame_count()}")
+        logging.debug(f"frame_count in original audio: {audio_segment.frame_count()}")
         # Compute expected length at given `sample_rate`
         expected_len = int(audio_segment.duration_seconds * sample_rate)
-        print(f"duration in secs: {audio_segment.duration_seconds}")
-        print(f"sample_rate: {sample_rate}")
-        print(f"expected_len (in samples): {expected_len}")
+        logging.debug(f"duration in secs: {audio_segment.duration_seconds}")
+        logging.debug(f"sample_rate: {sample_rate}")
+        logging.debug(f"expected_len (in samples): {expected_len}")
 
         # Resample to `sample_rate`
         audio_segment = audio_segment.set_frame_rate(sample_rate)
         sample_arr = audio_segment.get_array_of_samples()
         audio = np.array(sample_arr).astype(np.float32)
-        print(f"shape of resampled clip: {audio.shape}")
+        logging.debug(f"shape of resampled clip: {audio.shape}")
         # Zero pad missing samples, if any
         audio = spectral_ops.pad_or_trim_to_expected_length(audio, expected_len)
     # Convert from int to float representation.
@@ -65,7 +65,7 @@ def _load_audio(audio_path, sample_rate):
     beam.metrics.Metrics.counter('prepare-tfrecord', 'load-audio').inc()
     audio = _load_audio_as_array(audio_path, sample_rate)
     if sample_rate != CREPE_SAMPLE_RATE:
-        print("expected sample rate is not equal to CREPE SR")
+        logging.debug("expected sample rate is not equal to CREPE SR")
         audio_16k = _load_audio_as_array(audio_path, CREPE_SAMPLE_RATE)
     else:
         audio_16k = audio
@@ -82,12 +82,12 @@ def _chunk_audio(ex, sample_rate, chunk_secs):
 
     chunks = get_chunks(ex['audio'], sample_rate)
     chunks_16k = get_chunks(ex['audio_16k'], CREPE_SAMPLE_RATE)
-    print(f"chunks.shape: {chunks.shape}")
-    print(f"chunks_16k.shape: {chunks_16k.shape}")
+    logging.debug(f"chunks.shape: {chunks.shape}")
+    logging.debug(f"chunks_16k.shape: {chunks_16k.shape}")
 
     assert chunks.shape[0] == chunks_16k.shape[0]
     n_chunks = chunks.shape[0]
-    print(f"Number of chunks: {n_chunks}")
+    logging.debug(f"Number of chunks: {n_chunks}")
     for i in range(n_chunks):
         yield {'audio': chunks[i], 'audio_16k': chunks_16k[i]}
 
@@ -97,13 +97,13 @@ def _add_f0_estimate(ex, frame_rate, center, viterbi):
     beam.metrics.Metrics.counter('prepare-tfrecord', 'estimate-f0').inc()
     audio = ex['audio_16k']
     padding = 'center' if center else 'same'
-    print(f"Estimating f0")
-    print(f"Audio frame_count: {audio.frame_count()}")
+    logging.debug(f"Estimating f0")
+    logging.debug(f"Audio frame_count: {audio.frame_count()}")
     f0_hz, f0_confidence = spectral_ops.compute_f0(
         audio, frame_rate, viterbi=viterbi, padding=padding)
-    print(f"f0 estimate from CREPE: {f0_hz}")
-    print(f"f0 estimate from CREPE shape: {f0_hz.shape}")
-    print(f"f0 confidence from CREPE: {f0_confidence}")
+    logging.debug(f"f0 estimate from CREPE: {f0_hz}")
+    logging.debug(f"f0 estimate from CREPE shape: {f0_hz.shape}")
+    logging.debug(f"f0 confidence from CREPE: {f0_confidence}")
 
     ex = dict(ex)
     ex.update({
@@ -118,10 +118,10 @@ def _add_loudness(ex, frame_rate, n_fft, center):
     beam.metrics.Metrics.counter('prepare-tfrecord', 'compute-loudness').inc()
     audio = ex['audio_16k']
     padding = 'center' if center else 'same'
-    print(f"Estimating loudness")
+    logging.debug(f"Estimating loudness")
     loudness_db = spectral_ops.compute_loudness(
         audio, CREPE_SAMPLE_RATE, frame_rate, n_fft, padding=padding)
-    print(f"loudness_db: {loudness_db}")
+    logging.debug(f"loudness_db: {loudness_db}")
 
     ex = dict(ex)
     ex['loudness_db'] = loudness_db.numpy().astype(np.float32)

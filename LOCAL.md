@@ -348,6 +348,11 @@ WANDB_PROJECT=ddsp wandb artifact put -t model save_dir_ae/ckpt-45000.index
 WANDB_PROJECT=ddsp wandb artifact put -t model save_dir_ae/ckpt-45000.data-00000-of-00001
 WANDB_PROJECT=ddsp wandb artifact put save_dir_ae/operative_config-0.gin
 
+
+WANDB_PROJECT=ddsp wandb artifact put -n ae-rnn-mean-z-45600 -t model save_dir_ae_rnn_mean/ckpt-45600.index
+WANDB_PROJECT=ddsp wandb artifact put -n ae-rnn-mean-z-45600_data -t model save_dir_ae_rnn_mean/ckpt-45600.data-00000-of-00001
+WANDB_PROJECT=ddsp wandb artifact put -n ae-rnn-mean-z-45600_gin save_dir_ae_rnn_mean/operative_config-0.gin
+
 ```
 
 #### Note
