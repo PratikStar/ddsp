@@ -389,10 +389,12 @@ class MfccRnnEncoder(ZEncoder):
                rnn_type='gru',
                z_dims=512,
                mean_aggregate=False,
+               rnn_return_sequences=True,
                z_time_steps=250,
                **kwargs):
     super().__init__(**kwargs)
     self.mean_aggregate = mean_aggregate
+    self.rnn_return_sequences = rnn_return_sequences
     if z_time_steps not in [63, 125, 250, 500, 1000]:
       raise ValueError(
           '`z_time_steps` currently limited to 63,125,250,500 and 1000')
@@ -423,7 +425,7 @@ class MfccRnnEncoder(ZEncoder):
     self.overlap = self.z_audio_spec[str(z_time_steps)]['overlap']
     # Layers.
     self.norm_in = nn.Normalize('instance')
-    self.rnn = nn.Rnn(rnn_channels, rnn_type)
+    self.rnn = nn.Rnn(rnn_channels, rnn_type, return_sequences=self.rnn_return_sequences)
     self.dense_z = tfkl.Dense(z_dims)
 
   def compute_z(self, audio):
