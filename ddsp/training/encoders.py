@@ -57,7 +57,8 @@ class ZEncoder(nn.DictLayer):
   def expand_z(self, z, time_steps):
     """Make sure z has same temporal resolution as other conditioning."""
     logging.debug("ZEncoder.expand_z")
-    logging.debug(f"z[0,0,:] --> {z[0,0,:]}")
+    logging.debug(f"z shape --> {z.shape}")
+    # logging.debug(f"z[0,0,:] --> {z[0,0,:]}")
 
     # Add time dim of z if necessary.
     if len(z.shape) == 2:
