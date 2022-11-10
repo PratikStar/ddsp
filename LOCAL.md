@@ -252,7 +252,7 @@ ddsp_run \
 
 
 
-gcloud compute ssh instance-1 --zone us-east1-b --command "sudo expand-root.sh /dev/sda 1 ext4"
+gcloud compute ssh instance-1 --ssh-flag="-ServerAliveInterval=30" --zone us-east1-b --command "sudo expand-root.sh /dev/sda 1 ext4"
 
 wget https://developer.download.nvidia.com/compute/cuda/repos/debian11/x86_64/cuda-keyring_1.0-1_all.deb
 
@@ -306,11 +306,11 @@ gcloud ai-platform jobs list
 tensorboard --logdir save_dir/ &
 
 2. port forwarding
-gcloud compute ssh --zone us-east1-c instance-gpu -- -NfL 6006:localhost:6006
+gcloud compute ssh --ssh-flag="-ServerAliveInterval=30" --zone us-east1-c instance-gpu -- -NfL 6006:localhost:6006
 
 go to localhost:6006
 for reference. for ssh
-gcloud compute ssh --zone us-east1-c instance-gpu
+gcloud compute ssh --ssh-flag="-ServerAliveInterval=30" --zone us-east1-c instance-gpu
 
 
 ### Colab x GCE
@@ -320,7 +320,7 @@ dont follow this article though
 ```shell
 
 # SSH to the instance and sudo su
-gcloud compute ssh --zone us-east1-c instance-gpu
+gcloud compute ssh --ssh-flag="-ServerAliveInterval=30" --zone us-east1-c instance-gpu
 sudo su
 cd
 
@@ -335,7 +335,7 @@ jupyter notebook \
 --ip=0.0.0.0 \
 --allow-root >> ~/tmp/colab_$(date +%Y%m%d_%H%M%S).log 2>&1 &
 
-gcloud compute ssh --zone us-east1-c instance-gpu -- -NfvL 8888:instance-gpu:8888
+gcloud compute ssh --ssh-flag="-ServerAliveInterval=30" --zone us-east1-c instance-gpu -- -NfvL 8888:instance-gpu:8888
 
 # Copy the URL from the jupyter notebook command 
 # Open Colan and Connet to local runtime and use the copied URL from the first step.
@@ -518,7 +518,7 @@ conda activate test_env
 cd ~/ddsp
 pip install .
 
-
+# using many to one rnn layer. No mean
 ddsp_run \
   --mode=train \
   --save_dir=/root/save_dir_ae_rnn_last \
@@ -528,3 +528,8 @@ ddsp_run \
   --gin_param="TFRecordProvider.file_pattern='/root/tfrecord/train.tfrecord*'" \
   --gin_param="batch_size=16" \
   --alsologtostderr >> ~/logs/data_run_rnn_last_$(date +%Y%m%d_%H%M%S).log 2>&1 &
+
+tensorboard --logdir ~/save_dir_ae_rnn_last/ &
+
+2. port forwarding
+gcloud compute ssh --ssh-flag="-ServerAliveInterval=30" --zone us-east1-c instance-gpu -- -NfL 6006:localhost:6006
