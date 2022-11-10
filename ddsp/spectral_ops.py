@@ -344,8 +344,8 @@ def compute_f0(audio, frame_rate, viterbi=True, padding='center'):
   crepe_step_size = 1000 / frame_rate  # milliseconds
   hop_size = sample_rate // frame_rate
 
-  print(f"crepe_step_size in milliseconds: {crepe_step_size}")
-  print(f"hop_size: {hop_size}")
+  logging.debug(f"crepe_step_size in milliseconds: {crepe_step_size}")
+  logging.debug(f"hop_size: {hop_size}")
 
   audio = pad(audio, CREPE_FRAME_SIZE, hop_size, padding)
   audio = np.asarray(audio)

@@ -167,7 +167,7 @@ def allow_memory_growth():
         tf.config.experimental.set_memory_growth(gpu, True)
     except RuntimeError as e:
       # Memory growth must be set before GPUs have been initialized.
-      print(e)
+      logging.debug(e)
 
 
 def main(unused_argv):
@@ -189,15 +189,15 @@ def main(unused_argv):
 
   # Training.
   if FLAGS.mode == 'train':
-    print(f"ddsp_run. this is TRAINING")
+    logging.debug(f"ddsp_run. this is TRAINING")
     strategy = train_util.get_strategy(tpu=FLAGS.tpu,
                                        cluster_config=FLAGS.cluster_config)
-    print(f"strategy is {strategy}")
+    logging.debug(f"strategy is {strategy}")
     with strategy.scope():
       model = models.get_model()
       trainer = trainers.get_trainer_class()(model, strategy)
 
-    print("calling train_util.train")
+    logging.debug("calling train_util.train")
     train_util.train(data_provider=gin.REQUIRED,
                      trainer=trainer,
                      save_dir=save_dir,

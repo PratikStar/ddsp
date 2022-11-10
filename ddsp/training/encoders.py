@@ -34,7 +34,7 @@ class ZEncoder(nn.DictLayer):
   def __init__(self, input_keys=None, **kwargs):
     """Constructor."""
     input_keys = input_keys or self.get_argument_names('compute_z')
-    print(f"ZEncoder __init__, input_keys = {input_keys}")
+    logging.debug(f"ZEncoder __init__, input_keys = {input_keys}")
     super().__init__(input_keys, output_keys=['z'], **kwargs)
 
     # TODO(jesseengel): remove dependence on arbitrary key.
@@ -42,40 +42,40 @@ class ZEncoder(nn.DictLayer):
 
   def call(self, *args, **unused_kwargs):
     """Takes in input tensors and returns a latent tensor z."""
-    print("ZEncoder.call")
-    print(f"All args: {args}")
+    logging.debug("ZEncoder.call")
+    logging.debug(f"All args: {args}")
     time_steps = int(args[-1].shape[1])
-    print(f"time_steps: {time_steps}")
+    logging.debug(f"time_steps: {time_steps}")
 
     inputs = args[:-1]  # Last input just used for time_steps.
-    print(f"inputs to compute_z: {inputs}")
+    logging.debug(f"inputs to compute_z: {inputs}")
     z = self.compute_z(*inputs)
-    print(f"Returned from compute_z, {z.shape}")
+    logging.debug(f"Returned from compute_z, {z.shape}")
     return self.expand_z(z, time_steps)
 
   def expand_z(self, z, time_steps):
     """Make sure z has same temporal resolution as other conditioning."""
-    print("ZEncoder.expand_z")
-    print(f"z[0,0,:] --> {z[0,0,:]}")
+    logging.debug("ZEncoder.expand_z")
+    logging.debug(f"z[0,0,:] --> {z[0,0,:]}")
 
     # Add time dim of z if necessary.
     if len(z.shape) == 2:
       z = z[:, tf.newaxis, :]
     # Expand time dim of z if necessary.
     z_time_steps = int(z.shape[1])
-    print(f"z_time_steps: {z_time_steps}")
+    logging.debug(f"z_time_steps: {z_time_steps}")
 
     if z_time_steps != time_steps:
-      print("z_time_steps != time_steps. doing ddsp.core.resample")
+      logging.debug("z_time_steps != time_steps. doing ddsp.core.resample")
       z = ddsp.core.resample(z, time_steps)
 
-    print(f"z[0,0,:]: {z[0,0,:]}")
-    print(f"z[0,1,:]: {z[0,1,:]}")
-    print(f"z[0,2,:]: {z[0,2,:]}")
-    print(f"z[0,999,:]: {z[0,999,:]}")
+    logging.debug(f"z[0,0,:]: {z[0,0,:]}")
+    logging.debug(f"z[0,1,:]: {z[0,1,:]}")
+    logging.debug(f"z[0,2,:]: {z[0,2,:]}")
+    logging.debug(f"z[0,999,:]: {z[0,999,:]}")
 
-    print(f"returning from expand_z, new shape is: {z.shape}")
-    print(f"shape: {z.shape}")
+    logging.debug(f"returning from expand_z, new shape is: {z.shape}")
+    logging.debug(f"shape: {z.shape}")
     return z
 
   def compute_z(self, *inputs):
@@ -120,7 +120,7 @@ class MfccTimeDistributedRnnEncoder(ZEncoder):
             'overlap': 0.75
         }
     }
-    print(f"In MfccTimeDistributedRnnEncoder.init")
+    logging.debug(f"In MfccTimeDistributedRnnEncoder.init")
     self.fft_size = self.z_audio_spec[str(z_time_steps)]['fft_size']
     self.overlap = self.z_audio_spec[str(z_time_steps)]['overlap']
     self.rnn_return_sequences = rnn_return_sequences
@@ -140,20 +140,20 @@ class MfccTimeDistributedRnnEncoder(ZEncoder):
         overlap=self.overlap,
         pad_end=True)
 
-    print(f"mfccs: {mfccs.shape}")
+    logging.debug(f"mfccs: {mfccs.shape}")
     # Normalize.
     z = self.z_norm(mfccs[:, :, tf.newaxis, :])[:, :, 0, :]
-    print(f"normalized: {z.shape}")
+    logging.debug(f"normalized: {z.shape}")
     # Run an RNN over the latents.
     z = self.rnn(z)
-    print(f"after rnn: {z.shape}")
+    logging.debug(f"after rnn: {z.shape}")
 
     if not self.rnn_return_sequences:
       z = z[tf.newaxis, :]
     # Bounce down to compressed z dimensions.
     z = self.dense_out(z)
-    print(f"after dense out: {z.shape}")
-    print(z)
+    logging.debug(f"after dense out: {z.shape}")
+    logging.debug(z)
     # if self.config.timbre_encoder.converge_latent == "first":
     # print(f"shape of z before: {z.shape}")
     # z = tf.stack([t[0]] * z.shape[0])
@@ -166,7 +166,7 @@ class MfccTimeDistributedRnnEncoder(ZEncoder):
     # else:
     #     raise Exception("merge_encoding is not valid")
     # return z
-    print(f"Returning from compute_z: {z}")
+    logging.debug(f"Returning from compute_z: {z}")
     return z
 
 
@@ -416,7 +416,7 @@ class MfccRnnEncoder(ZEncoder):
             'overlap': 0.75
         }
     }
-    print(f"In MfccRnnEncoder.init")
+    logging.debug(f"In MfccRnnEncoder.init")
     self.fft_size = self.z_audio_spec[str(z_time_steps)]['fft_size']
     self.overlap = self.z_audio_spec[str(z_time_steps)]['overlap']
     # Layers.
@@ -425,7 +425,7 @@ class MfccRnnEncoder(ZEncoder):
     self.dense_z = tfkl.Dense(z_dims)
 
   def compute_z(self, audio):
-    print("In MfccRnnEncoder.compute_z")
+    logging.debug("In MfccRnnEncoder.compute_z")
     # mfccs = spectral_ops.compute_mfcc(
     #     audio,
     #     lo_hz=20.0,
@@ -442,25 +442,25 @@ class MfccRnnEncoder(ZEncoder):
         mfcc_bins=30,
         overlap=self.overlap,
         pad_end=True)
-    print(f"mfccs: {mfccs.shape}")
+    logging.debug(f"mfccs: {mfccs.shape}")
     z = self.norm_in(mfccs[:, :, tf.newaxis, :])[:, :, 0, :]
-    print(f"Normalized: {z.shape}")
+    logging.debug(f"Normalized: {z.shape}")
 
     if self.mean_aggregate:
-      print("mean aggregate is true")
+      logging.debug("mean aggregate is true")
       z = self.rnn(z)
-      print(f"After rnn: {z.shape}")
+      logging.debug(f"After rnn: {z.shape}")
       z = tf.reduce_mean(z, axis=1, keepdims=True)
-      print(f"After tf.reduce_mean: {z.shape}")
+      logging.debug(f"After tf.reduce_mean: {z.shape}")
     else:
       z = self.rnn(z)
-      print(f"After rnn: {z.shape}")
+      logging.debug(f"After rnn: {z.shape}")
       z = tf.concat(z, axis=-1)[:, tf.newaxis, :]
-      print(f"After tf.concat: {z.shape}")
+      logging.debug(f"After tf.concat: {z.shape}")
 
     # Bounce down to compressed dimensions.
     z = self.dense_z(z)
-    print(f"After dense: {z.shape}")
+    logging.debug(f"After dense: {z.shape}")
     return z
 
 
