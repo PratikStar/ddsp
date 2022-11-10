@@ -23,6 +23,7 @@ import librosa
 import numpy as np
 import tensorflow.compat.v2 as tf
 import tensorflow_probability as tfp
+from absl import logging
 
 CREPE_SAMPLE_RATE = 16000
 CREPE_FRAME_SIZE = 1024

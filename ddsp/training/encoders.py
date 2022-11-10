@@ -19,6 +19,7 @@ from ddsp import spectral_ops
 from ddsp.training import nn
 import gin
 import tensorflow.compat.v2 as tf
+from absl import logging
 
 tfkl = tf.keras.layers
 

@@ -17,6 +17,7 @@
 import ddsp
 from ddsp.training.models.model import Model
 import tensorflow as tf
+from absl import logging
 
 
 class Autoencoder(Model):
