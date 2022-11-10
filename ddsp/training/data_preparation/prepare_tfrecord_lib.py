@@ -69,7 +69,7 @@ def _load_audio(audio_path, sample_rate):
         audio_16k = _load_audio_as_array(audio_path, CREPE_SAMPLE_RATE)
     else:
         audio_16k = audio
-    return {'audio': audio, 'audio_16k': audio_16k}
+    return {'audio': audio, 'audio_16k': audio_16k, 'audio_path': audio_path}
 
 
 def _chunk_audio(ex, sample_rate, chunk_secs):
@@ -260,6 +260,8 @@ def prepare_tfrecord(input_audio_paths,
                 | beam.Create(input_audio_paths)
                 | beam.Map(_load_audio, sample_rate))
 
+        print(f"examples type are: {type(examples)}")
+        print(f"examples are: {examples}")
         # Split into chunks for train/eval split and better parallelism.
         if chunk_secs:
             examples |= beam.FlatMap(

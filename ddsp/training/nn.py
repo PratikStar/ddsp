@@ -867,7 +867,7 @@ class FcStack(tf.keras.Sequential):
 class Rnn(tfkl.Layer):
   """Single RNN layer."""
 
-  def __init__(self, dims, rnn_type, return_sequences=True, bidir=False,
+  def __init__(self, dims, rnn_type, return_sequences=False, bidir=False,
                **kwargs):
     super().__init__(**kwargs)
     rnn_class = {'lstm': tfkl.LSTM,
