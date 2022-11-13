@@ -72,6 +72,7 @@ from ddsp.training import trainers
 import gin
 import pkg_resources
 import tensorflow as tf
+import wandb
 
 gfile = tf.io.gfile
 FLAGS = flags.FLAGS
@@ -172,6 +173,8 @@ def allow_memory_growth():
 
 def main(unused_argv):
   """Parse gin config and run ddsp training, evaluation, or sampling."""
+  wandb.init(project='ddsp', entity='auditory-grounding')
+
   restore_dir = os.path.expanduser(FLAGS.restore_dir)
   save_dir = os.path.expanduser(FLAGS.save_dir)
   # If no separate restore directory is given, use the save directory.
@@ -226,6 +229,7 @@ def main(unused_argv):
                      save_dir=save_dir,
                      restore_dir=restore_dir,
                      run_once=FLAGS.run_once)
+  wandb.finish()
 
 
 def console_entry_point():

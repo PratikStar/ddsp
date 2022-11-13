@@ -353,6 +353,10 @@ WANDB_PROJECT=ddsp wandb artifact put -n ae-rnn-mean-z-45600 -t model save_dir_a
 WANDB_PROJECT=ddsp wandb artifact put -n ae-rnn-mean-z-45600_data -t model save_dir_ae_rnn_mean/ckpt-45600.data-00000-of-00001
 WANDB_PROJECT=ddsp wandb artifact put -n ae-rnn-mean-z-45600_gin save_dir_ae_rnn_mean/operative_config-0.gin
 
+WANDB_PROJECT=ddsp wandb artifact put -n ae-rnn-last-z-99900 -t model save_dir_ae_rnn_last/ckpt-99900.index
+WANDB_PROJECT=ddsp wandb artifact put -n ae-rnn-last-z-99900_data -t model save_dir_ae_rnn_last/ckpt-99900.data-00000-of-00001
+WANDB_PROJECT=ddsp wandb artifact put -n ae-rnn-last-z-99900_gin save_dir_ae_rnn_last/operative_config-0.gin
+
 ```
 
 #### Note
@@ -533,3 +537,14 @@ tensorboard --logdir ~/save_dir_ae_rnn_last/ &
 
 2. port forwarding
 gcloud compute ssh --ssh-flag="-ServerAliveInterval=30" --zone us-east1-c instance-gpu -- -NfL 6006:localhost:6006
+
+### wanbd test
+ddsp_run \
+  --mode=train \
+  --save_dir=/root/save_dir_ae_rnn_last \
+  --gin_file=/root/ddsp/ddsp/training/gin/models/ae_mfccRnnEncoder_last.gin \
+  --gin_file=/root/ddsp/ddsp/training/gin/datasets/tfrecord.gin \
+  --gin_file=/root/ddsp/ddsp/training/gin/eval/basic_f0_ld.gin \
+  --gin_param="TFRecordProvider.file_pattern='/root/tfrecord/train.tfrecord*'" \
+  --gin_param="batch_size=16" \
+  --alsologtostderr

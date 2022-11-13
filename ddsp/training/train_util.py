@@ -22,7 +22,7 @@ from absl import logging
 from ddsp.training import cloud
 import gin
 import tensorflow.compat.v2 as tf
-
+import wandb
 
 
 # ---------------------- Helper Functions --------------------------------------
@@ -305,6 +305,7 @@ def train(data_provider,
       log_str = 'step: {}\t'.format(int(step.numpy()))
       for k, v in losses.items():
         log_str += '{}: {:.2f}\t'.format(k, v)
+        wandb.log({k: v})
       logging.info(log_str)
 
       # Write Summaries.
