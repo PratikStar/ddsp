@@ -206,6 +206,11 @@ def write_gin_config(summary_writer, save_dir, step):
     tf.summary.text(name='gin/' + base_name, data=text_tensor, step=step)
     summary_writer.flush()
 
+  logging.info(f'Writing {base_name} to W&B')
+  artifact = wandb.Artifact('gin_temp', type='dataset')
+  artifact.add_file(fname)
+  wandb.log_artifact(artifact)
+
 
 # ------------------------ Training Loop ---------------------------------------
 @gin.configurable

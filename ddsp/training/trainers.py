@@ -80,10 +80,11 @@ class Trainer(object):
     checkpoint_path = manager.save(checkpoint_number=step)
     logging.info('Saved checkpoint to %s at step %s', save_dir, step)
     logging.info('Saving model took %.1f seconds', time.time() - start_time)
-    logging.info(f"Uploading {checkpoint_path} to Wandb...")
 
+    logging.info(f"Uploading {checkpoint_path} to Wandb...")
     artifact = wandb.Artifact(self.model.name, type='model')
-    artifact.add_file(checkpoint_path)
+    artifact.add_file(checkpoint_path + '.index')
+    artifact.add_file(checkpoint_path + '.data-00000-of-00001')
     wandb.log_artifact(artifact)
     # wandb.save(checkpoint_path)
 
