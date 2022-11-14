@@ -20,7 +20,7 @@ from absl import logging
 from ddsp.training import train_util
 import gin
 import tensorflow.compat.v2 as tf
-
+import wandb
 
 @gin.configurable
 class Trainer(object):
@@ -77,9 +77,15 @@ class Trainer(object):
     manager = tf.train.CheckpointManager(
         checkpoint, directory=save_dir, max_to_keep=self.checkpoints_to_keep)
     step = self.step.numpy()
-    manager.save(checkpoint_number=step)
+    checkpoint_path = manager.save(checkpoint_number=step)
     logging.info('Saved checkpoint to %s at step %s', save_dir, step)
     logging.info('Saving model took %.1f seconds', time.time() - start_time)
+    logging.info(f"Uploading {checkpoint_path} to Wandb...")
+
+    artifact = wandb.Artifact(self.model.name, type='model')
+    artifact.add_file(checkpoint_path)
+    wandb.log_artifact(artifact)
+    # wandb.save(checkpoint_path)
 
   def restore(self, checkpoint_path, restore_keys=None):
     """Restore model and optimizer from a checkpoint if it exists.

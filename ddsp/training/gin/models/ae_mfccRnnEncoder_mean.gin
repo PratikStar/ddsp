@@ -12,6 +12,7 @@ import ddsp.training
 # Model
 # =====
 get_model.model = @models.Autoencoder()
+Autoencoder.name = ae_rnn_last
 
 # Preprocessor
 Autoencoder.preprocessor = @preprocessing.F0LoudnessPreprocessor()
