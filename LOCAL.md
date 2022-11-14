@@ -547,4 +547,5 @@ ddsp_run \
   --gin_file=/root/ddsp/ddsp/training/gin/eval/basic_f0_ld.gin \
   --gin_param="TFRecordProvider.file_pattern='/root/tfrecord/train.tfrecord*'" \
   --gin_param="batch_size=16" \
+  --gin_param="steps_per_summary=2" \
   --alsologtostderr
