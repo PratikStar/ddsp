@@ -84,7 +84,7 @@ class Trainer(object):
     logging.info('Saving model took %.1f seconds', time.time() - start_time)
 
     logging.info(f"Uploading {checkpoint_path} to W&B...")
-    artifact = wandb.Artifact(self.run_name, type='model')
+    artifact = wandb.Artifact(f"{self.run_name}-{step}", type='model')
     artifact.add_file(checkpoint_path + '.index')
     artifact.add_file(checkpoint_path + '.data-00000-of-00001')
     wandb.log_artifact(artifact)

@@ -20,7 +20,7 @@ F0LoudnessPreprocessor.time_steps = 1000
 # Encoder
 Autoencoder.encoder = @encoders.MfccRnnEncoder()
 MfccRnnEncoder.rnn_channels = 512
-MfccRnnEncoder.rnn_type = 'gru'
+MfccRnnEncoder.rnn_type = 'lstm'
 MfccRnnEncoder.z_dims = 16
 MfccRnnEncoder.mean_aggregate = False
 MfccRnnEncoder.rnn_return_sequences = False

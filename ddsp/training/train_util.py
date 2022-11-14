@@ -207,7 +207,7 @@ def write_gin_config(summary_writer, save_dir, step, run_name):
     summary_writer.flush()
 
   logging.info(f'Writing {base_name} to W&B')
-  artifact = wandb.Artifact('gin_temp', type='dataset')
+  artifact = wandb.Artifact(run_name, type='dataset')
   artifact.add_file(fname)
   wandb.log_artifact(artifact)
 
