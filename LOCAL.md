@@ -552,10 +552,10 @@ ddsp_run \
 # LSTM
 ddsp_run \
   --mode=train \
-  --run_name=rnn_last \
+  --run_name=rnn_lstm_last \
   --gin_file=/root/ddsp/ddsp/training/gin/models/ae_mfccRnnEncoder_last.gin \
   --gin_file=/root/ddsp/ddsp/training/gin/datasets/tfrecord.gin \
   --gin_file=/root/ddsp/ddsp/training/gin/eval/basic_f0_ld.gin \
   --gin_param="TFRecordProvider.file_pattern='/root/tfrecord/train.tfrecord*'" \
   --gin_param="batch_size=16" \
-  --alsologtostderr 
+  --alsologtostderr >> ~/logs/ddsp_run_rnn_lstm_last_$(date +%Y%m%d_%H%M%S).log 2>&1 &

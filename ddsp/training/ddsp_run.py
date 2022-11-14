@@ -184,7 +184,7 @@ def main(unused_argv):
 
   # If no separate restore directory is given, use the save directory.
   restore_dir = save_dir if not restore_dir else restore_dir
-  logging.set_verbosity(logging.DEBUG)
+  logging.set_verbosity(logging.INFO)
 
   logging.info('Restore Dir: %s', restore_dir)
   logging.info('Save Dir: %s', save_dir)
