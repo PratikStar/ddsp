@@ -24,7 +24,7 @@ class Autoencoder(Model):
   """Wrap the model function for dependency injection with gin."""
 
   def __init__(self,
-               # name='ae',
+               nickname='ae',
                preprocessor=None,
                encoder=None,
                decoder=None,
@@ -33,7 +33,7 @@ class Autoencoder(Model):
                **kwargs):
     super().__init__(**kwargs)
     logging.debug("Autoencoder initializing")
-    # self.name = name
+    self.nickname = nickname
     self.preprocessor = preprocessor
     self.encoder = encoder
     self.decoder = decoder

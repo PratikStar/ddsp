@@ -168,7 +168,7 @@ def get_latest_operative_config(restore_dir):
         os.path.dirname(restore_dir), prefix='operative_config-', suffix='.gin')
 
 
-def write_gin_config(summary_writer, save_dir, step):
+def write_gin_config(summary_writer, save_dir, step, run_name):
   """"Writes gin operative_config to save_dir and tensorboard."""
   config_str = gin.operative_config_str()
 
@@ -275,7 +275,7 @@ def train(data_provider,
     summary_writer = tf.summary.create_file_writer(summary_dir)
 
     # Save the gin config.
-    write_gin_config(summary_writer, save_dir, trainer.step.numpy())
+    write_gin_config(summary_writer, save_dir, trainer.step.numpy(), trainer.run_name)
   else:
     # Need to create a dummy writer, even if no save_dir is provided.
     summary_writer = tf.summary.create_noop_writer()

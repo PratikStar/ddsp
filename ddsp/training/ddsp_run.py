@@ -80,9 +80,12 @@ FLAGS = flags.FLAGS
 # Program flags.
 flags.DEFINE_enum('mode', 'train', ['train', 'eval', 'sample'],
                   'Whether to train, evaluate, or sample from the model.')
-flags.DEFINE_string('save_dir', '/tmp/ddsp',
+flags.DEFINE_string('run_name', 'ae',
                     'Path where checkpoints and summary events will be saved '
                     'during training and evaluation.')
+flags.DEFINE_string('save_dir', '/root/save_dir_',
+                    'Path where checkpoints and summary events will be saved '
+                    'during training and evaluation. Default = ~/save_dir_{run_name}')
 flags.DEFINE_string('restore_dir', '',
                     'Path from which checkpoints will be restored before '
                     'training. Can be different than the save_dir.')
@@ -175,8 +178,10 @@ def main(unused_argv):
   """Parse gin config and run ddsp training, evaluation, or sampling."""
   wandb.init(project='ddsp', entity='auditory-grounding')
 
-  restore_dir = os.path.expanduser(FLAGS.restore_dir)
-  save_dir = os.path.expanduser(FLAGS.save_dir)
+  run_name = FLAGS.run_name
+  restore_dir = os.path.expanduser(FLAGS.restore_dir + run_name)
+  save_dir = os.path.expanduser(FLAGS.save_dir + run_name)
+
   # If no separate restore directory is given, use the save directory.
   restore_dir = save_dir if not restore_dir else restore_dir
   logging.set_verbosity(logging.DEBUG)
@@ -200,7 +205,7 @@ def main(unused_argv):
     logging.debug(f"strategy is {strategy}")
     with strategy.scope():
       model = models.get_model()
-      trainer = trainers.get_trainer_class()(model, strategy)
+      trainer = trainers.get_trainer_class()(model, strategy, run_name=run_name)
 
     logging.debug("calling train_util.train")
     train_util.train(data_provider=gin.REQUIRED,

@@ -29,6 +29,7 @@ class Trainer(object):
   def __init__(self,
                model,
                strategy,
+               run_name='ae',
                checkpoints_to_keep=100,
                learning_rate=0.001,
                lr_decay_steps=10000,
@@ -49,6 +50,7 @@ class Trainer(object):
         passed, restore the whole model.
     """
     self.model = model
+    self.run_name = run_name
     self.strategy = strategy
     self.checkpoints_to_keep = checkpoints_to_keep
     self.grad_clip_norm = grad_clip_norm
@@ -81,12 +83,11 @@ class Trainer(object):
     logging.info('Saved checkpoint to %s at step %s', save_dir, step)
     logging.info('Saving model took %.1f seconds', time.time() - start_time)
 
-    logging.info(f"Uploading {checkpoint_path} to Wandb...")
-    artifact = wandb.Artifact(self.model.name, type='model')
+    logging.info(f"Uploading {checkpoint_path} to W&B...")
+    artifact = wandb.Artifact(self.run_name, type='model')
     artifact.add_file(checkpoint_path + '.index')
     artifact.add_file(checkpoint_path + '.data-00000-of-00001')
     wandb.log_artifact(artifact)
-    # wandb.save(checkpoint_path)
 
   def restore(self, checkpoint_path, restore_keys=None):
     """Restore model and optimizer from a checkpoint if it exists.
