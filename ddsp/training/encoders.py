@@ -43,7 +43,7 @@ class ZEncoder(nn.DictLayer):
 
   def call(self, *args, **unused_kwargs):
     """Takes in input tensors and returns a latent tensor z."""
-    logging.debug("ZEncoder.call")
+    logging.debug("\nZEncoder.call")
     logging.debug(f"All args: {args}")
     time_steps = int(args[-1].shape[1])
     logging.debug(f"time_steps: {time_steps}")
