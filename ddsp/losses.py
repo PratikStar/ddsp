@@ -195,6 +195,10 @@ class SpectralLoss(Loss):
       self.spectrogram_ops.append(spectrogram_op)
 
   def call(self, target_audio, audio, weights=None):
+    logging.debug(f"In SpectralLoss.call")
+    logging.debug(f"\tpred: {audio:.2f}")
+    logging.debug(f"\ttarget: {target_audio:.2f}")
+
     loss = 0.0
 
     diff = core.diff
@@ -1079,7 +1083,7 @@ class ParamLoss(Loss):
     logging.debug(f"\tpred: {pred}")
     logging.debug(f"\ttarget: {target}")
     loss = mean_difference(pred, target, self.loss_type, weights)
-    logging.debug(f"\tloss: {loss}")
+    logging.debug(f"\tloss: {loss:.2f}")
     return self.weight * loss
 
 
