@@ -160,6 +160,7 @@ class Trainer(object):
   @tf.function
   def train_step(self, inputs):
     """Distributed training step."""
+    logging.debug("In train_step")
     # Wrap iterator in tf.function, slight speedup passing in iter vs batch.
     # print("Inside train_step")
     batch = next(inputs) if hasattr(inputs, '__next__') else inputs

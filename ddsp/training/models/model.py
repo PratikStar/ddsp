@@ -45,10 +45,12 @@ class Model(tf.keras.Model):
       losses: If return_losses=True, also returns a dictionary of losses,
         {loss_name: loss_value}.
     """
+    logging.debug("In model.__call__")
     # Copy mutable dicts if in graph mode to prevent side-effects (pure func).
     args = [copy_if_tf_function(a) if isinstance(a, dict) else a for a in args]
 
     # Run model.
+    logging.debug("Clearing the _losses_dict")
     self._losses_dict = {}
     outputs = super().__call__(*args, **kwargs)
 
@@ -56,11 +58,13 @@ class Model(tf.keras.Model):
     if not return_losses:
       return outputs
     else:
+      logging.debug("summing losses and saving in total_loss")
       self._losses_dict['total_loss'] = self.sum_losses(self._losses_dict)
       return outputs, self._losses_dict
 
   def sum_losses(self, losses_dict):
     """Sum all the scalar losses in a dictionary."""
+    logging.debug("In sum_losses")
     return tf.reduce_sum(list(losses_dict.values()))
 
   def _update_losses_dict(self, loss_objs, *args, **kwargs):

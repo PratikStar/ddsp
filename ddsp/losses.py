@@ -29,6 +29,7 @@ import gin
 import numpy as np
 import tensorflow.compat.v2 as tf
 import tensorflow_probability as tfp
+from absl import logging
 
 tfd = tfp.distributions
 tfkl = tf.keras.layers
@@ -43,6 +44,7 @@ class Loss(tfkl.Layer):
 
   def get_losses_dict(self, *args, **kwargs):
     """Returns a dictionary of losses for the model."""
+    logging.debug("In Loss.get_losses_dict")
     loss = self(*args, **kwargs)
     return {self.name: loss}
 
@@ -95,6 +97,7 @@ class LossGroup(dags.DAGLayer):
 
   def get_losses_dict(self, outputs, **kwargs):
     """Returns a dictionary of losses for the model, alias __call__."""
+    logging.debug("In LossGroup.get_losses_dict")
     return self(outputs, **kwargs)
 
 

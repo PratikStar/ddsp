@@ -79,11 +79,11 @@ class Autoencoder(Model):
 
   def call(self, features, training=True):
     """Run the core of the network, get predictions and loss."""
-    print(f"Autoencoder.call")
+    logging.debug(f"Autoencoder.call")
     features = self.encode(features, training=training)
     features.update(self.decoder(features, training=training))
 
-    print(f"Autoencoder, now through processor groups")
+    logging.debug(f"Autoencoder, now through processor groups")
     # Run through processor group.
     pg_out = self.processor_group(features, return_outputs_dict=True)
 
@@ -95,6 +95,6 @@ class Autoencoder(Model):
       self._update_losses_dict(
           self.loss_objs, features['audio'], outputs['audio_synth'])
 
-    print(f"Autoencoder, returning!")
+    logging.debug(f"Autoencoder, returning!")
     return outputs
 
