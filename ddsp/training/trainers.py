@@ -174,7 +174,7 @@ class Trainer(object):
   @tf.function
   def step_fn(self, batch):
     """Per-Replica training step."""
-    logging.debug("\nInside the step_fn")
+    logging.debug("Inside the step_fn")
     with tf.GradientTape() as tape:
       _, losses = self.model(batch, return_losses=True, training=True)
     logging.debug("Out from calling the model")

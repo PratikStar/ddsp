@@ -64,7 +64,9 @@ class Model(tf.keras.Model):
 
   def sum_losses(self, losses_dict):
     """Sum all the scalar losses in a dictionary."""
-    logging.debug("In sum_losses")
+    logging.debug(f"In sum_losses, list(losses_dict.values()): {list(losses_dict.values())}\n")
+    for k, v in losses_dict.items():
+      logging.debug(f"\t{k}: {v}")
     return tf.reduce_sum(list(losses_dict.values()))
 
   def _update_losses_dict(self, loss_objs, *args, **kwargs):
@@ -72,7 +74,6 @@ class Model(tf.keras.Model):
     logging.debug("In _update_losses_dict")
     for loss_obj in ddsp.core.make_iterable(loss_objs):
       if hasattr(loss_obj, 'get_losses_dict'):
-        logging.debug(f"{loss_obj} has attribute get_losses_dict")
         losses_dict = loss_obj.get_losses_dict(*args, **kwargs)
         logging.debug(f"{losses_dict}\n")
         self._losses_dict.update(losses_dict)
