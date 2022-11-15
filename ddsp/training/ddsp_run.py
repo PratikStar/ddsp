@@ -86,7 +86,7 @@ flags.DEFINE_string('run_name', 'ae',
 flags.DEFINE_string('save_dir', '/root/save_dir_',
                     'Path where checkpoints and summary events will be saved '
                     'during training and evaluation. Default = ~/save_dir_{run_name}')
-flags.DEFINE_string('restore_dir', '',
+flags.DEFINE_string('restore_dir', '/root/save_dir_',
                     'Path from which checkpoints will be restored before '
                     'training. Can be different than the save_dir.')
 flags.DEFINE_string('tpu', '', 'Address of the TPU. No TPU if left blank.')
