@@ -287,11 +287,10 @@ def train(data_provider,
     first_step = True
 
     while trainer.step < num_steps:
-      # print(f"This is {trainer.step} step")
+      logging.debug(f"\nThis is {trainer.step} step")
       step = trainer.step
 
       # Take a step.
-      # print("Taking a step")
       losses = trainer.train_step(dataset_iter)
 
       # Create training loss metrics when starting/restarting training.

@@ -99,7 +99,7 @@ class Trainer(object):
     Raises:
       FileNotFoundError: If no checkpoint is found.
     """
-    logging.info('Restoring from checkpoint...')
+    logging.info('\nRestoring from checkpoint...')
     start_time = time.time()
 
     # Prefer function args over object properties.
@@ -160,7 +160,7 @@ class Trainer(object):
   @tf.function
   def train_step(self, inputs):
     """Distributed training step."""
-    logging.debug("In train_step")
+    logging.debug("\nIn train_step")
     # Wrap iterator in tf.function, slight speedup passing in iter vs batch.
     # print("Inside train_step")
     batch = next(inputs) if hasattr(inputs, '__next__') else inputs

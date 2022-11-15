@@ -542,7 +542,7 @@ gcloud compute ssh --ssh-flag="-ServerAliveInterval=30" --zone us-east1-c instan
 DEBUG=1 ddsp_run \
   --mode=train \
   --run_name=rnn_last \
-  --gin_file=/root/ddsp/ddsp/training/gin/models/ae_mfccRnnEncoder_last.gin \
+  --gin_file=/root/ddsp/ddsp/training/gin/models/ae_mfccRnnEncoder_mean.gin \
   --gin_file=/root/ddsp/ddsp/training/gin/datasets/tfrecord.gin \
   --gin_file=/root/ddsp/ddsp/training/gin/eval/basic_f0_ld.gin \
   --gin_param="TFRecordProvider.file_pattern='/root/tfrecord/train.tfrecord*'" \
