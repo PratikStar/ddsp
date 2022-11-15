@@ -196,8 +196,8 @@ class SpectralLoss(Loss):
 
   def call(self, target_audio, audio, weights=None):
     logging.debug(f"In SpectralLoss.call")
-    logging.debug(f"\tpred: {audio:.2f}")
-    logging.debug(f"\ttarget: {target_audio:.2f}")
+    logging.debug(f"\tpred: {audio}")
+    logging.debug(f"\ttarget: {target_audio}")
 
     loss = 0.0
 
