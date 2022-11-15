@@ -93,7 +93,7 @@ class Autoencoder(Model):
 
     if training:
       self._update_losses_dict(
-          self.loss_objs, features['audio'], outputs['audio_synth'])
+          self.loss_objs, features['audio'], outputs['audio_synth'], features['z'])
 
     logging.debug(f"Autoencoder, returning!")
     return outputs

@@ -1083,7 +1083,7 @@ class ParamLoss(Loss):
     logging.debug(f"\tpred: {pred}")
     logging.debug(f"\ttarget: {target}")
     loss = mean_difference(pred, target, self.loss_type, weights)
-    logging.debug(f"\tloss: {loss:.2f}")
+    logging.debug(f"\tloss: {loss}")
     return self.weight * loss
 
 
