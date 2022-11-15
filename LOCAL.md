@@ -539,7 +539,7 @@ tensorboard --logdir ~/save_dir_ae_rnn_last/ &
 gcloud compute ssh --ssh-flag="-ServerAliveInterval=30" --zone us-east1-c instance-gpu -- -NfL 6006:localhost:6006
 
 ### wanbd test
-ddsp_run \
+DEBUG=1 ddsp_run \
   --mode=train \
   --run_name=rnn_last \
   --gin_file=/root/ddsp/ddsp/training/gin/models/ae_mfccRnnEncoder_last.gin \
