@@ -168,18 +168,21 @@ class Trainer(object):
     losses = self.run(self.step_fn, batch)
     # Add up the scalar losses across replicas.
     n_replicas = self.strategy.num_replicas_in_sync
+    logging.debug("Returning from the train_step\n")
     return {k: self.psum(v, axis=None) / n_replicas for k, v in losses.items()}
 
   @tf.function
   def step_fn(self, batch):
     """Per-Replica training step."""
-    # print("Inside the step_fn")
+    logging.debug("\nInside the step_fn")
     with tf.GradientTape() as tape:
       _, losses = self.model(batch, return_losses=True, training=True)
+    logging.debug("Out from calling the model")
     # Clip and apply gradients.
     grads = tape.gradient(losses['total_loss'], self.model.trainable_variables)
     grads, _ = tf.clip_by_global_norm(grads, self.grad_clip_norm)
     self.optimizer.apply_gradients(zip(grads, self.model.trainable_variables))
+    logging.debug("Returning from the step_fn\n")
     return losses
 
 
