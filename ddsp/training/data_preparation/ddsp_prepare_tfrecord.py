@@ -29,6 +29,8 @@ from absl import flags
 # from ddsp.training.data_preparation.prepare_tfrecord_lib import prepare_tfrecord
 from prepare_tfrecord_lib import prepare_tfrecord
 import tensorflow.compat.v2 as tf
+import os
+from absl import logging
 
 FLAGS = flags.FLAGS
 
@@ -104,6 +106,10 @@ def run():
 
 def main(unused_argv):
   """From command line."""
+  if "DEBUG" in os.environ:
+    logging.set_verbosity(logging.DEBUG)
+  else:
+    logging.set_verbosity(logging.INFO)
   run()
 
 
