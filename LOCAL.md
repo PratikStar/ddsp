@@ -188,7 +188,7 @@ sudo apt install ffmpeg
 
 ddsp_prepare_tfrecord \
 --input_audio_filepatterns='/root/buckets/pratik-ddsp-data/monophonic/*wav' \
---output_tfrecord_path=/root/tfrecord/train.tfrecord \
+--output_tfrecord_path=/root/tmp/train.tfrecord \
 --chunk_secs=0.0 \
 --num_shards=10 \
 --alsologtostderr

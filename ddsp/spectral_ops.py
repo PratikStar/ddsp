@@ -360,6 +360,9 @@ def compute_f0(audio, frame_rate, viterbi=True, padding='center'):
       center=False,
       verbose=0)
 
+  logging.debug(f"shape of f0_hz: {f0_hz.shape}")
+  logging.debug(f"shape of f0_confidence: {f0_confidence.shape}")
+
   # Postprocessing.
   f0_hz = f0_hz.astype(np.float32)
   f0_confidence = f0_confidence.astype(np.float32)

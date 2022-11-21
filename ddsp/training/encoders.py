@@ -467,6 +467,100 @@ class MfccRnnEncoder(ZEncoder):
     logging.debug(f"After dense: {z.shape}")
     return z
 
+@gin.register
+class MfccRnnVariationalEncoder(ZEncoder):
+  """Use MFCCs as latent variables, compress to single timestep."""
+
+  def __init__(self,
+               rnn_channels=512,
+               rnn_type='gru',
+               z_dims=512,
+               mean_aggregate=False,
+               rnn_return_sequences=True,
+               z_time_steps=250,
+               **kwargs):
+    super().__init__(**kwargs)
+    self.mean_aggregate = mean_aggregate
+    self.rnn_return_sequences = rnn_return_sequences
+    if z_time_steps not in [63, 125, 250, 500, 1000]:
+      raise ValueError(
+          '`z_time_steps` currently limited to 63,125,250,500 and 1000')
+    self.z_audio_spec = {
+        '63': {
+            'fft_size': 2048,
+            'overlap': 0.5
+        },
+        '125': {
+            'fft_size': 1024,
+            'overlap': 0.5
+        },
+        '250': {
+            'fft_size': 1024,
+            'overlap': 0.75
+        },
+        '500': {
+            'fft_size': 512,
+            'overlap': 0.75
+        },
+        '1000': {
+            'fft_size': 256,
+            'overlap': 0.75
+        }
+    }
+    logging.debug(f"In MfccRnnEncoder.init")
+    self.fft_size = self.z_audio_spec[str(z_time_steps)]['fft_size']
+    self.overlap = self.z_audio_spec[str(z_time_steps)]['overlap']
+    # Layers.
+    self.norm_in = nn.Normalize('instance')
+    self.rnn = nn.Rnn(rnn_channels, rnn_type, return_sequences=self.rnn_return_sequences)
+    self.dense_mu = tfkl.Dense(z_dims)
+    self.dense_logvar = tfkl.Dense(z_dims)
+
+  def compute_z(self, audio):
+    logging.debug("In MfccRnnEncoder.compute_z")
+    # mfccs = spectral_ops.compute_mfcc(
+    #     audio,
+    #     lo_hz=20.0,
+    #     hi_hz=8000.0,
+    #     fft_size=1024,
+    #     mel_bins=128,
+    #     mfcc_bins=30)
+    mfccs = spectral_ops.compute_mfcc(
+        audio,
+        lo_hz=20.0,
+        hi_hz=8000.0,
+        fft_size=self.fft_size,
+        mel_bins=128,
+        mfcc_bins=30,
+        overlap=self.overlap,
+        pad_end=True)
+    logging.debug(f"mfccs: {mfccs.shape}")
+    z = self.norm_in(mfccs[:, :, tf.newaxis, :])[:, :, 0, :]
+    logging.debug(f"Normalized: {z.shape}")
+
+    if self.mean_aggregate:
+      logging.debug("mean aggregate is true")
+      z = self.rnn(z)
+      logging.debug(f"After rnn: {z.shape}")
+      z = tf.reduce_mean(z, axis=1, keepdims=True)
+      logging.debug(f"After tf.reduce_mean: {z.shape}")
+    else:
+      z = self.rnn(z)
+      logging.debug(f"After rnn: {z.shape}")
+      z = tf.concat(z, axis=-1)[:, tf.newaxis, :]
+      logging.debug(f"After tf.concat: {z.shape}")
+
+    # Bounce down to compressed dimensions.
+    mu = self.dense_mu(z)
+    logvar = self.dense_logvar(z)
+    logging.debug(f"mu: {mu.shape}")
+    logging.debug(f"logvar: {logvar.shape}")
+
+    # working here!!
+    std = torch.exp(0.5 * logvar)
+    eps = torch.randn_like(std)
+    return eps * std + mu
+    return z
 
 @gin.register
 class MidiEncoder(nn.DictLayer):

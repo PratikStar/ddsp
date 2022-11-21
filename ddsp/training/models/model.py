@@ -66,7 +66,7 @@ class Model(tf.keras.Model):
     """Sum all the scalar losses in a dictionary."""
     logging.debug(f"In sum_losses, list(losses_dict.values()): {list(losses_dict.values())}\n")
     for k, v in losses_dict.items():
-      logging.debug(f"\t{k}: {v:.2f}")
+      logging.debug(f"\t{k}: {v}")
     return tf.reduce_sum(list(losses_dict.values()))
 
   def _update_losses_dict(self, loss_objs, *args, **kwargs):
