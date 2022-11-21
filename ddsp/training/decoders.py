@@ -85,9 +85,7 @@ class RnnFcDecoder(nn.DictLayer):
     def call(self, *inputs, **unused_kwargs):
         # Last input is always carried state for stateless RNN.
         logging.debug("In RnnFcDecoder.call")
-        logging.debug(f"Input features to *RnnFcDecoder* are as below: ")
-        for k, v in inputs.items():
-            logging.debug(f"\t{k} --> {v}")
+        logging.debug(f"Input features to *RnnFcDecoder* are as below: {inputs}")
 
         inputs = list(inputs)
         if self.stateless:
