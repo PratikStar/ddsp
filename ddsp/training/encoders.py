@@ -71,11 +71,6 @@ class ZEncoder(nn.DictLayer):
       logging.debug("z_time_steps != time_steps. doing ddsp.core.resample")
       z = ddsp.core.resample(z, time_steps)
 
-    logging.debug(f"z[0,0,:]: {z[0,0,:]}")
-    logging.debug(f"z[0,1,:]: {z[0,1,:]}")
-    logging.debug(f"z[0,2,:]: {z[0,2,:]}")
-    logging.debug(f"z[0,999,:]: {z[0,999,:]}")
-
     logging.debug(f"returning from expand_z, new shape is: {z.shape}")
     logging.debug(f"shape: {z.shape}")
     return z

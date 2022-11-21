@@ -121,6 +121,7 @@ def _add_loudness(ex, frame_rate, n_fft, center):
     logging.debug(f"Estimating loudness")
     loudness_db = spectral_ops.compute_loudness(
         audio, CREPE_SAMPLE_RATE, frame_rate, n_fft, padding=padding)
+    logging.debug(f" shape of loudness_db: {loudness_db.shape}")
     logging.debug(f"loudness_db: {loudness_db}")
 
     ex = dict(ex)

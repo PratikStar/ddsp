@@ -258,43 +258,6 @@ wget https://developer.download.nvidia.com/compute/cuda/repos/debian11/x86_64/cu
 
 ## ddsp_run on AI Platform
 
-### Image build and push
-cd /root/ddsp/ddsp/training/docker
-
-export PROJECT_ID=ddsp-366504
-export IMAGE_REPO_NAME=ddsp_train
-export IMAGE_TAG=ai_platform
-export IMAGE_URI=gcr.io/$PROJECT_ID/$IMAGE_REPO_NAME:$IMAGE_TAG
-
-[//]: #(https://stackoverflow.com/questions/55446787/permission-issues-while-docker-push)
-[comment]: <> (https://docs.docker.com/engine/install/debian/#install-using-the-repository)
-
-docker build -f Dockerfile -t $IMAGE_URI ./
-docker push $IMAGE_URI
-
-### Submit job
-
-export SAVE_DIR=gs://pratik-ddsp-models
-export FILE_PATTERN=gs://pratik-ddsp-tfrecord/train.tfrecord*
-export REGION=us-east1
-
-cd /root/ddsp/ddsp/training/docker
-
-export JOB_NAME=ddsp_container_job_$(date +%Y%m%d_%H%M%S)
-gcloud ai-platform jobs submit training $JOB_NAME \
-  --region $REGION \
-  --config config_single_vm.yaml \
-  --master-image-uri $IMAGE_URI \
-  -- \
-  --save_dir=$SAVE_DIR \
-  --file_pattern=$FILE_PATTERN \
-  --batch_size=16 \
-  --learning_rate=0.0001 \
-  --num_steps=40000 \
-  --early_stop_loss_value=5.0
-
-
-gcloud ai-platform jobs list
 
 [comment]: <> (https://console.cloud.google.com/ai-platform/jobs?authuser=1&project=ddsp-366504)
 
@@ -392,129 +355,6 @@ This VM requires Nvidia drivers to function correctly.   Installation takes ~1 m
 
 
 
-
-
-```shell
-I1031 09:49:25.585731 139929154720000 ddsp_run.py:179] Restore Dir: /root/save_dir_tmp
-I1031 09:49:25.586658 139929154720000 ddsp_run.py:180] Save Dir: /root/save_dir_tmp
-I1031 09:49:25.587098 139929154720000 resource_reader.py:50] system_path_file_exists:optimization/base.gin
-E1031 09:49:25.587472 139929154720000 resource_reader.py:55] Path not found: optimization/base.gin
-I1031 09:49:25.590388 139929154720000 resource_reader.py:50] system_path_file_exists:eval/basic.gin
-E1031 09:49:25.590616 139929154720000 resource_reader.py:55] Path not found: eval/basic.gin
-I1031 09:49:25.593094 139929154720000 ddsp_run.py:152] Operative config not found in /root/save_dir_tmp
-I1031 09:49:25.597534 139929154720000 resource_reader.py:50] system_path_file_exists:datasets/base.gin
-E1031 09:49:25.597746 139929154720000 resource_reader.py:55] Path not found: datasets/base.gin
-I1031 09:49:25.605808 139929154720000 ddsp_run.py:184] Operative Gin Config:
-import ddsp
-import ddsp.training as ddsp2
-
-# Macros:
-# ==============================================================================
-batch_size = 16
-evaluators = [@BasicEvaluator, @F0LdEvaluator]
-learning_rate = 0.0003
-
-# Parameters for processors.Add:
-# ==============================================================================
-processors.Add.name = 'add'
-
-# Parameters for Autoencoder:
-# ==============================================================================
-Autoencoder.decoder = @decoders.RnnFcDecoder()
-Autoencoder.encoder = @encoders.MfccTimeDistributedRnnEncoder()
-Autoencoder.losses = [@losses.SpectralLoss()]
-Autoencoder.preprocessor = @preprocessing.F0LoudnessPreprocessor()
-Autoencoder.processor_group = @processors.ProcessorGroup()
-
-# Parameters for evaluate:
-# ==============================================================================
-evaluate.batch_size = 32
-evaluate.data_provider = @data.TFRecordProvider()
-evaluate.evaluator_classes = %evaluators
-evaluate.num_batches = 5
-
-# Parameters for F0LoudnessPreprocessor:
-# ==============================================================================
-F0LoudnessPreprocessor.time_steps = 1000
-
-# Parameters for FilteredNoise:
-# ==============================================================================
-FilteredNoise.n_samples = 64000
-FilteredNoise.name = 'filtered_noise'
-FilteredNoise.scale_fn = @core.exp_sigmoid
-FilteredNoise.window_size = 0
-
-# Parameters for get_model:
-# ==============================================================================
-get_model.model = @models.Autoencoder()
-
-# Parameters for Harmonic:
-# ==============================================================================
-Harmonic.n_samples = 64000
-Harmonic.name = 'harmonic'
-Harmonic.normalize_below_nyquist = True
-Harmonic.sample_rate = 16000
-Harmonic.scale_fn = @core.exp_sigmoid
-
-# Parameters for MfccTimeDistributedRnnEncoder:
-# ==============================================================================
-MfccTimeDistributedRnnEncoder.rnn_channels = 512
-MfccTimeDistributedRnnEncoder.rnn_type = 'gru'
-MfccTimeDistributedRnnEncoder.z_dims = 16
-MfccTimeDistributedRnnEncoder.z_time_steps = 125
-
-# Parameters for ProcessorGroup:
-# ==============================================================================
-ProcessorGroup.dag = \
-    [(@synths.Harmonic(), ['amps', 'harmonic_distribution', 'f0_hz']),
-     (@synths.FilteredNoise(), ['noise_magnitudes']),
-     (@processors.Add(), ['filtered_noise/signal', 'harmonic/signal'])]
-
-# Parameters for RnnFcDecoder:
-# ==============================================================================
-RnnFcDecoder.ch = 512
-RnnFcDecoder.input_keys = ('ld_scaled', 'f0_scaled', 'z')
-RnnFcDecoder.layers_per_stack = 3
-RnnFcDecoder.output_splits = \
-    (('amps', 1), ('harmonic_distribution', 100), ('noise_magnitudes', 65))
-RnnFcDecoder.rnn_channels = 512
-RnnFcDecoder.rnn_type = 'gru'
-
-# Parameters for sample:
-# ==============================================================================
-sample.batch_size = 16
-sample.ckpt_delay_secs = 300
-sample.data_provider = @data.TFRecordProvider()
-sample.evaluator_classes = %evaluators
-sample.num_batches = 1
-
-# Parameters for SpectralLoss:
-# ==============================================================================
-SpectralLoss.logmag_weight = 1.0
-SpectralLoss.loss_type = 'L1'
-SpectralLoss.mag_weight = 1.0
-
-# Parameters for TFRecordProvider:
-# ==============================================================================
-TFRecordProvider.file_pattern = '/root/tfrecord/train.tfrecord*'
-
-# Parameters for train:
-# ==============================================================================
-train.batch_size = %batch_size
-train.data_provider = @data.TFRecordProvider()
-train.num_steps = 1000000
-train.steps_per_save = 300
-train.steps_per_summary = 300
-
-# Parameters for Trainer:
-# ==============================================================================
-Trainer.checkpoints_to_keep = 100
-Trainer.grad_clip_norm = 3.0
-Trainer.learning_rate = %learning_rate
-Trainer.lr_decay_rate = 0.98
-Trainer.lr_decay_steps = 10000
-```
-
 # install package from source
 conda create -n test_env python=3.9.12
 conda activate test_env
@@ -550,7 +390,7 @@ DEBUG=1 ddsp_run \
   --alsologtostderr
 
 # LSTM
-ddsp_run \
+DEBUG=1 ddsp_run \
   --mode=train \
   --run_name=rnn_lstm_last \
   --gin_file=/root/ddsp/ddsp/training/gin/models/ae_mfccRnnEncoder_last.gin \
@@ -561,10 +401,31 @@ ddsp_run \
   --alsologtostderr >> ~/logs/ddsp_run_rnn_lstm_last_$(date +%Y%m%d_%H%M%S).log 2>&1 &
 
 
-# working on 44.1khz crepe
-python /root/ddsp/ddsp/training/data_preparation/ddsp_prepare_tfrecord.py \
+# for 44.1khz crepe
+DEBUG=1 python /root/ddsp/ddsp/training/data_preparation/ddsp_prepare_tfrecord.py \
 --input_audio_filepatterns='/root/buckets/pratik-ddsp-data/monophonic/*wav' \
---output_tfrecord_path=/root/tmp/train.tfrecord \
+--output_tfrecord_path=/root/tfrecord441khz/train.tfrecord \
 --chunk_secs=0.0 \
 --num_shards=10 \
+--frame_rate=210 \
+--sample_rate=44100 \
 --alsologtostderr
+
+DEBUG=1 ddsp_run \
+  --mode=train \
+  --run_name=rnn_last_441 \
+  --gin_file=/root/ddsp/ddsp/training/gin/models/ae_mfccRnnEncoder_last.gin \
+  --gin_file=/root/ddsp/ddsp/training/gin/datasets/tfrecord.gin \
+  --gin_file=/root/ddsp/ddsp/training/gin/eval/basic_f0_ld.gin \
+  --gin_param="TFRecordProvider.file_pattern='/root/tfrecord441khz/train.tfrecord*'" \
+  --gin_param="batch_size=16" \
+  --alsologtostderr \
+  --gin_param="TFRecordProvider.sample_rate=44100" \
+  --gin_param="Harmonic.sample_rate=44100" \
+  --gin_param="FilteredNoise.n_samples=176400" \
+  --gin_param="Harmonic.n_samples=176400" \
+  --gin_param="Reverb.reverb_length=176400" \
+  --gin_param='F0LoudnessPreprocessor.time_steps=840' \
+  --gin_param='F0LoudnessPreprocessor.frame_rate=210' \
+  --gin_param='F0LoudnessPreprocessor.sample_rate=44100' \
+  --gin_param="TFRecordProvider.frame_rate=210"
