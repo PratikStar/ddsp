@@ -40,11 +40,11 @@ def _load_audio_as_array(audio_path, sample_rate):
     with tf.io.gfile.GFile(audio_path, 'rb') as f:
         # Load audio at original SR
         audio_segment = (pydub.AudioSegment.from_file(f).set_channels(1))
-        logging.debug(f"frame_count in original audio: {audio_segment.frame_count()}")
+        logging.debug(f"_load_audio_as_array called with sr: {sample_rate}")
+        logging.debug(f"samples in original audio: {audio_segment.frame_count()}")
         # Compute expected length at given `sample_rate`
         expected_len = int(audio_segment.duration_seconds * sample_rate)
         logging.debug(f"duration in secs: {audio_segment.duration_seconds}")
-        logging.debug(f"sample_rate: {sample_rate}")
         logging.debug(f"expected_len (in samples): {expected_len}")
 
         # Resample to `sample_rate`
@@ -61,11 +61,11 @@ def _load_audio_as_array(audio_path, sample_rate):
 
 def _load_audio(audio_path, sample_rate):
     """Load audio file."""
-    logging.info("Loading '%s'.", audio_path)
+    logging.info("In _load_audio. Loading '%s'\n\n", audio_path)
     beam.metrics.Metrics.counter('prepare-tfrecord', 'load-audio').inc()
     audio = _load_audio_as_array(audio_path, sample_rate)
     if sample_rate != CREPE_SAMPLE_RATE:
-        logging.debug("expected sample rate is not equal to CREPE SR")
+        logging.debug("expected sample rate is not equal to CREPE SR. So loading audio with CREPE_SAMPLE_RATE")
         audio_16k = _load_audio_as_array(audio_path, CREPE_SAMPLE_RATE)
     else:
         audio_16k = audio
@@ -75,6 +75,7 @@ def _load_audio(audio_path, sample_rate):
 def _chunk_audio(ex, sample_rate, chunk_secs):
     """Pad audio and split into chunks."""
     beam.metrics.Metrics.counter('prepare-tfrecord', 'load-audio').inc()
+    logging.info("In _chunk_audio")
 
     def get_chunks(audio, sample_rate):
         chunk_size = int(chunk_secs * sample_rate)
@@ -101,9 +102,8 @@ def _add_f0_estimate(ex, frame_rate, center, viterbi):
     # logging.debug(f"Audio frame_count: {audio.frame_count()}")
     f0_hz, f0_confidence = spectral_ops.compute_f0(
         audio, frame_rate, viterbi=viterbi, padding=padding)
-    logging.debug(f"f0 estimate from CREPE: {f0_hz}")
-    logging.debug(f"f0 estimate from CREPE shape: {f0_hz.shape}")
-    logging.debug(f"f0 confidence from CREPE: {f0_confidence}")
+    logging.debug(f"\tf0 estimate from CREPE: {f0_hz}")
+    logging.debug(f"\tf0 estimate from CREPE shape: {f0_hz.shape}")
 
     ex = dict(ex)
     ex.update({
@@ -121,8 +121,8 @@ def _add_loudness(ex, frame_rate, n_fft, center):
     logging.debug(f"Estimating loudness")
     loudness_db = spectral_ops.compute_loudness(
         audio, CREPE_SAMPLE_RATE, frame_rate, n_fft, padding=padding)
-    logging.debug(f" shape of loudness_db: {loudness_db.shape}")
-    logging.debug(f"loudness_db: {loudness_db}")
+    logging.debug(f"\tshape of loudness_db: {loudness_db.shape}")
+    logging.debug(f"\tloudness_db: {loudness_db}")
 
     ex = dict(ex)
     ex['loudness_db'] = loudness_db.numpy().astype(np.float32)
@@ -131,6 +131,8 @@ def _add_loudness(ex, frame_rate, n_fft, center):
 
 def _split_example(ex, sample_rate, frame_rate, example_secs, hop_secs, center):
     """Splits example into windows, padding final window if needed."""
+    logging.debug(f"In _split_example\n")
+    logging.debug(f"{ex}")
 
     def get_windows(sequence, rate, center):
         window_size = int(example_secs * rate)
@@ -299,4 +301,5 @@ def prepare_tfrecord(input_audio_paths,
             postprocess_pipeline(train_split, f'{output_tfrecord_path}-train',
                                  'train')
         else:
+            logging.debug(f"Calling postprocess_pipeline")
             postprocess_pipeline(examples, output_tfrecord_path)

@@ -158,7 +158,7 @@ def audio_bytes_to_np(wav_data,
       num_channels=1 if mono else None)
 
 
-def upload(sample_rate=DEFAULT_SAMPLE_RATE, normalize_db=None):
+def upload(sample_rate, normalize_db=None):
   """Load a collection of audio files (.wav, .mp3) from disk into colab.
 
   Args:

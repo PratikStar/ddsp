@@ -402,9 +402,10 @@ DEBUG=1 ddsp_run \
 
 
 # for 44.1khz crepe
+## sr=44100 and frame rate= 210
 DEBUG=1 python /root/ddsp/ddsp/training/data_preparation/ddsp_prepare_tfrecord.py \
 --input_audio_filepatterns='/root/buckets/pratik-ddsp-data/monophonic/*wav' \
---output_tfrecord_path=/root/tfrecord441khz/train.tfrecord \
+--output_tfrecord_path=/root/tfrecord_441sr_210fr/train.tfrecord \
 --chunk_secs=0.0 \
 --num_shards=10 \
 --frame_rate=210 \
@@ -413,11 +414,11 @@ DEBUG=1 python /root/ddsp/ddsp/training/data_preparation/ddsp_prepare_tfrecord.p
 
 DEBUG=1 ddsp_run \
   --mode=train \
-  --run_name=rnn_last_441 \
+  --run_name=rnn_last_441_210 \
   --gin_file=/root/ddsp/ddsp/training/gin/models/ae_mfccRnnEncoder_last.gin \
   --gin_file=/root/ddsp/ddsp/training/gin/datasets/tfrecord.gin \
   --gin_file=/root/ddsp/ddsp/training/gin/eval/basic_f0_ld.gin \
-  --gin_param="TFRecordProvider.file_pattern='/root/tfrecord441khz/train.tfrecord*'" \
+  --gin_param="TFRecordProvider.file_pattern='/root/tfrecord_441sr_210fr/train.tfrecord*'" \
   --gin_param="batch_size=16" \
   --alsologtostderr \
   --gin_param="TFRecordProvider.sample_rate=44100" \
@@ -428,4 +429,43 @@ DEBUG=1 ddsp_run \
   --gin_param='F0LoudnessPreprocessor.time_steps=840' \
   --gin_param='F0LoudnessPreprocessor.frame_rate=210' \
   --gin_param='F0LoudnessPreprocessor.sample_rate=44100' \
-  --gin_param="TFRecordProvider.frame_rate=210"
+  --gin_param="TFRecordProvider.frame_rate=210" >> ~/logs/ddsp_run_gru_last_441_210_$(date +%Y%m%d_%H%M%S).log 2>&1 &
+
+## sr=44100 and frame rate=1000
+DEBUG=1 python /root/ddsp/ddsp/training/data_preparation/ddsp_prepare_tfrecord.py \
+--input_audio_filepatterns='/root/buckets/pratik-ddsp-data/monophonic/*wav' \
+--output_tfrecord_path=/root/tfrecord_441sr_1000fr/train.tfrecord \
+--chunk_secs=0.0 \
+--num_shards=10 \
+--frame_rate=1000 \
+--sample_rate=44100 \
+--alsologtostderr  >> ~/logs/ddsp_data_441_1000_$(date +%Y%m%d_%H%M%S).log 2>&1 &
+
+
+DEBUG=1 python /root/ddsp/ddsp/training/data_preparation/ddsp_prepare_tfrecord.py \
+--input_audio_filepatterns='/root/buckets/pratik-ddsp-data/monophonic/*wav' \
+--output_tfrecord_path=/root/tfrecord_441sr_1000fr/train.tfrecord \
+--chunk_secs=0.0 \
+--num_shards=10 \
+--frame_rate=1000 \
+--sample_rate=44100 \
+--alsologtostderr  >> ~/logs/ddsp_data_441_1000_$(date +%Y%m%d_%H%M%S).log 2>&1 &
+
+DEBUG=1 ddsp_run \
+  --mode=train \
+  --run_name=rnn_last_441_1000 \
+  --gin_file=/root/ddsp/ddsp/training/gin/models/ae_mfccRnnEncoder_last.gin \
+  --gin_file=/root/ddsp/ddsp/training/gin/datasets/tfrecord.gin \
+  --gin_file=/root/ddsp/ddsp/training/gin/eval/basic_f0_ld.gin \
+  --gin_param="TFRecordProvider.file_pattern='/root/tfrecord_441sr_1000fr/train.tfrecord*'" \
+  --gin_param="batch_size=16" \
+  --alsologtostderr \
+  --gin_param="TFRecordProvider.sample_rate=44100" \
+  --gin_param="Harmonic.sample_rate=44100" \
+  --gin_param="FilteredNoise.n_samples=176400" \
+  --gin_param="Harmonic.n_samples=176400" \
+  --gin_param="Reverb.reverb_length=176400" \
+  --gin_param='F0LoudnessPreprocessor.time_steps=4000' \
+  --gin_param='F0LoudnessPreprocessor.frame_rate=1000' \
+  --gin_param='F0LoudnessPreprocessor.sample_rate=44100' \
+  --gin_param="TFRecordProvider.frame_rate=1000"
