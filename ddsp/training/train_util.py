@@ -309,7 +309,7 @@ def train(data_provider,
       log_str = 'step: {}\t'.format(int(step.numpy()))
       for k, v in losses.items():
         log_str += '{}: {:.2f}\t'.format(k, v)
-        wandb.log({k: v})
+      wandb.log({"step": step, **losses})
       logging.info(log_str)
 
       # Write Summaries.

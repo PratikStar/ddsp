@@ -153,31 +153,32 @@ sudo apt-get install --no-install-recommends libnvinfer6=6.0.1-1+cuda10.1 \
 ```shell
 sudo su
 
-git clone <ddsp>
 
 apt-get install git
 apt-get install wget
 # install miniconda: https://docs.conda.io/projects/conda/en/latest/user-guide/install/linux.html
 wget https://repo.anaconda.com/miniconda/Miniconda3-py39_4.12.0-Linux-x86_64.sh
-bash Miniconda3.....
+bash Miniconda3
 source /root/.bashrc
 
 sudo apt-get install libsndfile-dev
-pip install tensorflow==2.11.0rc0
-pip install apache-beam
+sudo apt install ffmpeg
 pip install --upgrade pip
+pip install tensorflow==2.11.0rc0
+pip install apache-beam wandb
 pip install --upgrade ddsp
 
-gcsfuse --> https://medium.com/google-cloud/scheduled-mirror-sync-sftp-to-gcs-b167d0eb487a
-gsutil -> https://hartwigmedical.github.io/documentation/accessing-hartwig-data-through-gcp.html#accessing-data
-mkdir ~/bucket ~/bucket-tfrecord
-gcsfuse pratik-ddsp-data ~/bucket
-gcsfuse pratik-ddsp-tfrecord ~/bucket-tfrecord
-OR
+ssh-keygen
+<add key to github>
+git clone git@github.com:PratikStar/ddsp.git
+cd ddsp
+pip install .
+
+mkdir ~/buckets ~/logs
 gsutil -u ddsp-366504 cp -r gs://pratik-ddsp-data ~/buckets
+#gsutil -> https://hartwigmedical.github.io/documentation/accessing-hartwig-data-through-gcp.html#accessing-data THIS works!!
 
 
-sudo apt install ffmpeg
 
 # install docker. IFF not already installed
 
@@ -442,15 +443,6 @@ DEBUG=1 python /root/ddsp/ddsp/training/data_preparation/ddsp_prepare_tfrecord.p
 --alsologtostderr  >> ~/logs/ddsp_data_441_1000_$(date +%Y%m%d_%H%M%S).log 2>&1 &
 
 
-DEBUG=1 python /root/ddsp/ddsp/training/data_preparation/ddsp_prepare_tfrecord.py \
---input_audio_filepatterns='/root/buckets/pratik-ddsp-data/monophonic/*wav' \
---output_tfrecord_path=/root/tfrecord_441sr_1000fr/train.tfrecord \
---chunk_secs=0.0 \
---num_shards=10 \
---frame_rate=1000 \
---sample_rate=44100 \
---alsologtostderr  >> ~/logs/ddsp_data_441_1000_$(date +%Y%m%d_%H%M%S).log 2>&1 &
-
 DEBUG=1 ddsp_run \
   --mode=train \
   --run_name=rnn_last_441_1000 \
@@ -469,3 +461,103 @@ DEBUG=1 ddsp_run \
   --gin_param='F0LoudnessPreprocessor.frame_rate=1000' \
   --gin_param='F0LoudnessPreprocessor.sample_rate=44100' \
   --gin_param="TFRecordProvider.frame_rate=1000"
+
+
+## sr=44100 and frame rate=252
+
+DEBUG=1 python /root/ddsp/ddsp/training/data_preparation/ddsp_prepare_tfrecord.py \
+--input_audio_filepatterns='/root/buckets/pratik-ddsp-data/monophonic/*wav' \
+--output_tfrecord_path=/root/tfrecord_441sr_252fr/train.tfrecord \
+--chunk_secs=0.0 \
+--num_shards=10 \
+--frame_rate=252 \
+--sample_rate=44100 \
+--alsologtostderr  >> ~/logs/ddsp_data_441_1000_$(date +%Y%m%d_%H%M%S).log 2>&1 &
+
+DEBUG=1 ddsp_run \
+  --mode=train \
+  --run_name=rnn_last_441_252 \
+  --gin_file=/root/ddsp/ddsp/training/gin/models/ae_mfccRnnEncoder_last.gin \
+  --gin_file=/root/ddsp/ddsp/training/gin/datasets/tfrecord.gin \
+  --gin_file=/root/ddsp/ddsp/training/gin/eval/basic_f0_ld.gin \
+  --gin_param="TFRecordProvider.file_pattern='/root/tfrecord_441sr_252fr/train.tfrecord*'" \
+  --gin_param="batch_size=16" \
+  --alsologtostderr \
+  --gin_param="TFRecordProvider.sample_rate=44100" \
+  --gin_param="Harmonic.sample_rate=44100" \
+  --gin_param="FilteredNoise.n_samples=176400" \
+  --gin_param="Harmonic.n_samples=176400" \
+  --gin_param="Reverb.reverb_length=176400" \
+  --gin_param='F0LoudnessPreprocessor.time_steps=1008' \
+  --gin_param='F0LoudnessPreprocessor.frame_rate=252' \
+  --gin_param='F0LoudnessPreprocessor.sample_rate=44100' \
+  --gin_param="TFRecordProvider.frame_rate=252" >> ~/logs/ddsp_run_gru_last_441_252_$(date +%Y%m%d_%H%M%S).log 2>&1 &
+
+
+## sr=32000 and frame rate=250
+
+DEBUG=1 python /root/ddsp/ddsp/training/data_preparation/ddsp_prepare_tfrecord.py \
+--input_audio_filepatterns='/root/buckets/pratik-ddsp-data/monophonic/*wav' \
+--output_tfrecord_path=/root/tfrecord_320sr_252fr/train.tfrecord \
+--chunk_secs=0.0 \
+--num_shards=10 \
+--frame_rate=250 \
+--sample_rate=32000 \
+--alsologtostderr  >> ~/logs/ddsp_data_320_250_$(date +%Y%m%d_%H%M%S).log 2>&1 &
+
+DEBUG=1 ddsp_run \
+  --mode=train \
+  --run_name=rnn_last_320_250 \
+  --gin_file=/root/ddsp/ddsp/training/gin/models/ae_mfccRnnEncoder_last.gin \
+  --gin_file=/root/ddsp/ddsp/training/gin/datasets/tfrecord.gin \
+  --gin_file=/root/ddsp/ddsp/training/gin/eval/basic_f0_ld.gin \
+  --gin_param="TFRecordProvider.file_pattern='/root/tfrecord_320sr_250fr/train.tfrecord*'" \
+  --gin_param="batch_size=16" \
+  --alsologtostderr \
+  --gin_param="TFRecordProvider.sample_rate=32000" \
+  --gin_param="Harmonic.sample_rate=32000" \
+  --gin_param="FilteredNoise.n_samples=96000" \
+  --gin_param="Harmonic.n_samples=96000" \
+  --gin_param="Reverb.reverb_length=96000" \
+  --gin_param='F0LoudnessPreprocessor.time_steps=1000' \
+  --gin_param='F0LoudnessPreprocessor.frame_rate=250' \
+  --gin_param='F0LoudnessPreprocessor.sample_rate=32000' \
+  --gin_param="TFRecordProvider.frame_rate=250" >> ~/logs/ddsp_run_gru_last_320_250_$(date +%Y%m%d_%H%M%S).log 2>&1 &
+
+
+## sr=44100 and frame rate=700. batch size =8
+
+DEBUG=1 python /root/ddsp/ddsp/training/data_preparation/ddsp_prepare_tfrecord.py \
+--input_audio_filepatterns='/root/buckets/pratik-ddsp-data/monophonic/*1*wav' \
+--output_tfrecord_path=/root/tfrecord_441sr_700fr/train.tfrecord \
+--chunk_secs=0.0 \
+--num_shards=10 \
+--frame_rate=700 \
+--sample_rate=44100 \
+--alsologtostderr  >> ~/logs/ddsp_data_441_700_$(date +%Y%m%d_%H%M%S).log 2>&1 &
+
+DEBUG=1 ddsp_run \
+  --mode=train \
+  --run_name=rnn_last_441_700 \
+  --gin_file=/root/ddsp/ddsp/training/gin/models/ae_mfccRnnEncoder_last.gin \
+  --gin_file=/root/ddsp/ddsp/training/gin/datasets/tfrecord.gin \
+  --gin_file=/root/ddsp/ddsp/training/gin/eval/basic_f0_ld.gin \
+  --gin_param="TFRecordProvider.file_pattern='/root/tfrecord_441sr_700fr/train.tfrecord*'" \
+  --gin_param="batch_size=8" \
+  --alsologtostderr \
+  --gin_param="TFRecordProvider.sample_rate=44100" \
+  --gin_param="Harmonic.sample_rate=44100" \
+  --gin_param="FilteredNoise.n_samples=176400" \
+  --gin_param="Harmonic.n_samples=176400" \
+  --gin_param="Reverb.reverb_length=176400" \
+  --gin_param='F0LoudnessPreprocessor.time_steps=2800' \
+  --gin_param='F0LoudnessPreprocessor.frame_rate=700' \
+  --gin_param='F0LoudnessPreprocessor.sample_rate=44100' \
+  --gin_param="TFRecordProvider.frame_rate=700" >> ~/logs/ddsp_run_gru_last_441_700_$(date +%Y%m%d_%H%M%S).log 2>&1 &
+
+
+gcloud compute ssh --ssh-flag="-ServerAliveInterval=30" --zone us-west1-b instance-gpu-1
+gcloud compute ssh --ssh-flag="-ServerAliveInterval=30" --zone asia-east1-a instance-gpu-2
+
+# instance-gpu-1
+Trained on 252 fr and 44.1khz sr
