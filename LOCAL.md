@@ -528,17 +528,16 @@ DEBUG=1 ddsp_run \
 ## sr=44100 and frame rate=700. batch size =8
 
 DEBUG=1 python /root/ddsp/ddsp/training/data_preparation/ddsp_prepare_tfrecord.py \
---input_audio_filepatterns='/root/buckets/pratik-ddsp-data/monophonic/*1*wav' \
---output_tfrecord_path=/root/tfrecord_441sr_700fr/train.tfrecord \
+--input_audio_filepatterns='/root/buckets/pratik-ddsp-data/monophonic/09*wav' \
+--output_tfrecord_path=/root/tfrecord_441sr_700fr_09/train.tfrecord \
 --chunk_secs=0.0 \
---num_shards=10 \
 --frame_rate=700 \
 --sample_rate=44100 \
---alsologtostderr  >> ~/logs/ddsp_data_441_700_$(date +%Y%m%d_%H%M%S).log 2>&1 &
+--alsologtostderr  >> ~/logs/ddsp_data_441_700_09_$(date +%Y%m%d_%H%M%S).log 2>&1 &
 
 DEBUG=1 ddsp_run \
   --mode=train \
-  --run_name=rnn_last_441_700 \
+  --run_name=rnn_last_441_700_again \
   --gin_file=/root/ddsp/ddsp/training/gin/models/ae_mfccRnnEncoder_last.gin \
   --gin_file=/root/ddsp/ddsp/training/gin/datasets/tfrecord.gin \
   --gin_file=/root/ddsp/ddsp/training/gin/eval/basic_f0_ld.gin \
@@ -549,7 +548,7 @@ DEBUG=1 ddsp_run \
   --gin_param="Harmonic.sample_rate=44100" \
   --gin_param="FilteredNoise.n_samples=176400" \
   --gin_param="Harmonic.n_samples=176400" \
-  --gin_param="Reverb.reverb_length=176400" \
+  --gin_param="Reverb.reverb_length=132300" \
   --gin_param='F0LoudnessPreprocessor.time_steps=2800' \
   --gin_param='F0LoudnessPreprocessor.frame_rate=700' \
   --gin_param='F0LoudnessPreprocessor.sample_rate=44100' \
@@ -561,3 +560,65 @@ gcloud compute ssh --ssh-flag="-ServerAliveInterval=30" --zone asia-east1-a inst
 
 # instance-gpu-1
 Trained on 252 fr and 44.1khz sr
+
+
+# one timbre
+
+
+DEBUG=1 python /root/ddsp/ddsp/training/data_preparation/ddsp_prepare_tfrecord.py \
+--input_audio_filepatterns='/root/test-audio/*' \
+--output_tfrecord_path=/root/tfrecord_only-test_160_250-8-2/train.tfrecord \
+--chunk_secs=0.0 \
+--frame_rate=250 \
+--num_shards=8 \
+--example_secs=2 \
+--sample_rate=16000 \
+--alsologtostderr >> ~/logs/ddsp_data_test-audio_160_250_$(date +%Y%m%d_%H%M%S).log 2>&1 &
+
+
+DEBUG=1 ddsp_run \
+  --mode=train \
+  --run_name=test-audio_160_250-8-2 \
+  --gin_file=/root/ddsp/ddsp/training/gin/models/ae_mfccRnnEncoder_last.gin \
+  --gin_file=/root/ddsp/ddsp/training/gin/datasets/tfrecord.gin \
+  --gin_file=/root/ddsp/ddsp/training/gin/eval/basic_f0_ld.gin \
+  --gin_param="TFRecordProvider.file_pattern='/root/tfrecord_only-test_160_250-8-2/train.tfrecord*'" \
+  --gin_param="batch_size=8" \
+  --alsologtostderr \
+  --gin_param="TFRecordProvider.sample_rate=16000" \
+  --gin_param="Harmonic.sample_rate=16000" \
+  --gin_param="FilteredNoise.n_samples=32000" \
+  --gin_param="Harmonic.n_samples=32000" \
+  --gin_param='F0LoudnessPreprocessor.time_steps=500' \
+  --gin_param='F0LoudnessPreprocessor.frame_rate=250' \
+  --gin_param='F0LoudnessPreprocessor.sample_rate=16000' \
+  --gin_param="TFRecordProvider.frame_rate=250" >> ~/logs/ddsp_run_test-audio_160_250_$(date +%Y%m%d_%H%M%S).log 2>&1 &
+
+DEBUG=1 ddsp_run \
+  --mode=train \
+  --run_name=ae_rnn_last_again \
+  --gin_file=/root/ddsp/ddsp/training/gin/models/ae_mfccRnnEncoder_last.gin \
+  --gin_file=/root/ddsp/ddsp/training/gin/datasets/tfrecord.gin \
+  --gin_file=/root/ddsp/ddsp/training/gin/eval/basic_f0_ld.gin \
+  --gin_param="TFRecordProvider.file_pattern='/root/tfrecord/train.tfrecord*'" \
+  --gin_param="batch_size=16" \
+  --alsologtostderr  >> ~/logs/ddsp_run-ae_rnn_last_again$(date +%Y%m%d_%H%M%S).log 2>&1 &
+
+
+ddsp_run \
+ --mode=train \
+ --run_name=ae_rnn_last_again \
+ --gin_file=/root/ddsp/ddsp/training/gin/models/ae_mfccRnnEncoder_last.gin \
+ --gin_file=/root/ddsp/ddsp/training/gin/datasets/tfrecord.gin \
+ --gin_file=/root/ddsp/ddsp/training/gin/eval/basic_f0_ld.gin \
+ --gin_param="TFRecordProvider.file_pattern='/root/tfrecord_test_sr32k_fr250_shards10/train.tfrecord*'" \
+ --gin_param="batch_size=16" \
+ --alsologtostderr \
+  --gin_param="TFRecordProvider.sample_rate=32000" \
+  --gin_param="Harmonic.sample_rate=32000" \
+  --gin_param="FilteredNoise.n_samples=96000" \
+  --gin_param="Harmonic.n_samples=128000" \
+  --gin_param='F0LoudnessPreprocessor.time_steps=1000' \
+  --gin_param='F0LoudnessPreprocessor.frame_rate=250' \
+  --gin_param='F0LoudnessPreprocessor.sample_rate=32000' \
+  --gin_param="TFRecordProvider.frame_rate=250"

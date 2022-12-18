@@ -84,10 +84,13 @@ class Trainer(object):
     logging.info('Saving model took %.1f seconds', time.time() - start_time)
 
     logging.info(f"Uploading {checkpoint_path} to W&B...")
+    start_time = time.time()
+
     artifact = wandb.Artifact(f"{self.run_name}-{step}", type='model')
     artifact.add_file(checkpoint_path + '.index')
     artifact.add_file(checkpoint_path + '.data-00000-of-00001')
     wandb.log_artifact(artifact)
+    logging.info('Uploading to W&B took %.1f seconds', time.time() - start_time)
 
   def restore(self, checkpoint_path, restore_keys=None):
     """Restore model and optimizer from a checkpoint if it exists.

@@ -83,6 +83,7 @@ class Harmonic(processors.Processor):
         However, using angular cumulative sum is slower on accelerators.
       name: Synth name.
     """
+
     super().__init__(name=name)
     self.n_samples = n_samples
     self.sample_rate = sample_rate
