@@ -1042,7 +1042,7 @@ def get_harmonic_frequencies(frequencies: tf.Tensor,
     harmonic_frequencies: Oscillator frequencies (Hz).
       Shape [batch_size, :, n_harmonics].
   """
-  logging.debug("core.get_harmonic_frequencies (Converts distribution to frequencies)")
+  logging.debug("core.get_harmonic_frequencies: (Create integer multiples of the fundamental frequency. Nothing to do with the distribution!)")
   frequencies = tf_float32(frequencies)
 
   f_ratios = tf.linspace(1.0, float(n_harmonics), int(n_harmonics))
@@ -1081,13 +1081,19 @@ def harmonic_synthesis(frequencies: tf.Tensor,
   Returns:
     audio: Output audio. Shape [batch_size, n_samples, 1]
   """
-  logging.debug("core.harmonic_synthesis")
+  logging.debug("core.harmonic_synthesis()")
+  logging.debug(f"core.harmonic_synthesis:  + \
+                      frequencies: {frequencies.shape} + \
+                      amplitudes: {amplitudes.shape}, + \
+                      harmonic_distribution: {harmonic_distribution.shape}, + \
+                      sample_rate: {sample_rate}")
+
   frequencies = tf_float32(frequencies)
   amplitudes = tf_float32(amplitudes)
 
   if harmonic_distribution is not None:
     harmonic_distribution = tf_float32(harmonic_distribution)
-    n_harmonics = int(harmonic_distribution.shape[-1])
+    n_harmonics = int(harmonic_distribution.shape[-1]) # 100 in DDSP
   elif harmonic_shifts is not None:
     harmonic_shifts = tf_float32(harmonic_shifts)
     n_harmonics = int(harmonic_shifts.shape[-1])
@@ -1095,17 +1101,18 @@ def harmonic_synthesis(frequencies: tf.Tensor,
     n_harmonics = 1
 
   # Create harmonic frequencies [batch_size, n_frames, n_harmonics].
-  logging.debug("Creating frequencies from distribution")
+  logging.debug("Creating harmonic_frequencies from f0. (Nothing to do with the distribution ratio!!)")
   harmonic_frequencies = get_harmonic_frequencies(frequencies, n_harmonics)
   if harmonic_shifts is not None:
     harmonic_frequencies *= (1.0 + harmonic_shifts)
 
   # Create harmonic amplitudes [batch_size, n_frames, n_harmonics].
   if harmonic_distribution is not None:
-    logging.debug("Creating amplitudes from distribution")
+    logging.debug("Scaling the amplitudes wrt the distribution")
     harmonic_amplitudes = amplitudes * harmonic_distribution
   else:
     harmonic_amplitudes = amplitudes
+
   logging.debug(f"harmonic_frequencies: {harmonic_frequencies.shape}")
   logging.debug(f"harmonic_amplitudes: {harmonic_amplitudes.shape}")
 
@@ -1114,7 +1121,7 @@ def harmonic_synthesis(frequencies: tf.Tensor,
   frequency_envelopes = resample(harmonic_frequencies, n_samples)  # [1, 16000, 100] <-- [1, 250, 100], 16000
   amplitude_envelopes = resample(harmonic_amplitudes, n_samples,  # [1, 16000, 1] <-- [1, 250, 1], 16000
                                  method=amp_resample_method)
-  logging.debug(f"frequency_envelopes: {frequency_envelopes.shape}")
+  logging.debug(f"frequency_envelopes: {frequency_envelopes.shape} (This is what generates the sine waves later!)")
   logging.debug(f"amplitude_envelopes: {amplitude_envelopes.shape}")
 
   # Synthesize from harmonics [batch_size, n_samples].

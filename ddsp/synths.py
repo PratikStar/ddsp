@@ -110,6 +110,7 @@ class Harmonic(processors.Processor):
       controls: Dictionary of tensors of synthesizer controls.
     """
     logging.debug(f"synths.Harmonic.get_controls")
+    logging.debug(f"synths.Harmonic.get_controls: amplitudes: {amplitudes.shape}, harmonic_distribution: {harmonic_distribution.shape}")
     # Scale the amplitudes.
     # Note: Makes the amplitude and harmonics non-negative by applying a (custom) sigmoid non-linearity!!
     if self.scale_fn is not None:

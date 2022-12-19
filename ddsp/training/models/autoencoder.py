@@ -45,7 +45,7 @@ class Autoencoder(Model):
         logging.debug(f"Autoencoder.encode")
         logging.debug(f"Input features to *encode* are as below: ")
         for k, v in features.items():
-            logging.debug(f"\t{k} --> {v}")
+            logging.debug(f"\t{k} 's shape--> {v.shape}")
 
         if self.preprocessor is not None:
             features.update(self.preprocessor(features, training=training))
@@ -54,7 +54,7 @@ class Autoencoder(Model):
 
         logging.debug(f"Output features from *encode* are as below: ")
         for k, v in features.items():
-            logging.debug(f"\t{k} --> {v}")
+            logging.debug(f"\t{k} 's shape --> {v.shape}")
 
         return features
 
@@ -63,13 +63,13 @@ class Autoencoder(Model):
         logging.debug(f"Autoencoder.decode")
         logging.debug(f"Input features to *decode* are as below: ")
         for k, v in features.items():
-            logging.debug(f"\t{k} --> {v}")
+            logging.debug(f"\t{k} 's shape--> {v.shape}")
 
         features.update(self.decoder(features, training=training))
 
         logging.debug(f"Output features from *decode* are as below: ")
         for k, v in features.items():
-            print(f"\t{k} --> {v}")
+            logging.debug(f"\t{k} 's shape --> {v.shape}")
 
         return self.processor_group(features)
 
@@ -97,6 +97,6 @@ class Autoencoder(Model):
 
         logging.debug(f"Output features from AUTOENCODER are as below: ")
         for k, v in outputs.items():
-            logging.debug(f"\t{k} --> {v}")
+            logging.debug(f"\t{k} 's shape--> {v.shape}")
         logging.debug(f"Autoencoder, returning!")
         return outputs

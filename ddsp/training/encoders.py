@@ -44,7 +44,7 @@ class ZEncoder(nn.DictLayer):
   def call(self, *args, **unused_kwargs):
     """Takes in input tensors and returns a latent tensor z."""
     logging.debug("\nZEncoder.call")
-    logging.debug(f"All args: {args}")
+    # logging.debug(f"All args: {args}")
     time_steps = int(args[-1].shape[1])
     logging.debug(f"time_steps: {time_steps}")
 
@@ -150,7 +150,7 @@ class MfccTimeDistributedRnnEncoder(ZEncoder):
     # Bounce down to compressed z dimensions.
     z = self.dense_out(z)
     logging.debug(f"after dense out: {z.shape}")
-    logging.debug(z)
+    # logging.debug(z)
     # if self.config.timbre_encoder.converge_latent == "first":
     # print(f"shape of z before: {z.shape}")
     # z = tf.stack([t[0]] * z.shape[0])
@@ -163,7 +163,7 @@ class MfccTimeDistributedRnnEncoder(ZEncoder):
     # else:
     #     raise Exception("merge_encoding is not valid")
     # return z
-    logging.debug(f"Returning from compute_z: {z}")
+    logging.debug(f"Returning from compute_z")
     return z
 
 
