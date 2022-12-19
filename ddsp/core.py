@@ -938,10 +938,12 @@ def oscillator_bank(frequency_envelopes: tf.Tensor,
     wav: Sample-wise audio. Shape [batch_size, n_samples, n_sinusoids] if
       sum_sinusoids=False, else shape is [batch_size, n_samples].
   """
+  logging.debug("core.oscillator_bank")
   frequency_envelopes = tf_float32(frequency_envelopes)
   amplitude_envelopes = tf_float32(amplitude_envelopes)
 
   # Don't exceed Nyquist.
+  logging.debug("core.oscillator_bank Removing above Nyquist")
   amplitude_envelopes = remove_above_nyquist(frequency_envelopes,
                                              amplitude_envelopes,
                                              sample_rate)
@@ -1104,12 +1106,16 @@ def harmonic_synthesis(frequencies: tf.Tensor,
     harmonic_amplitudes = amplitudes * harmonic_distribution
   else:
     harmonic_amplitudes = amplitudes
+  logging.debug(f"harmonic_frequencies: {harmonic_frequencies.shape}")
+  logging.debug(f"harmonic_amplitudes: {harmonic_amplitudes.shape}")
 
   # Create sample-wise envelopes.
   logging.debug("core.harmonic_synthesis Upsampling")
   frequency_envelopes = resample(harmonic_frequencies, n_samples)  # [1, 16000, 100] <-- [1, 250, 100], 16000
   amplitude_envelopes = resample(harmonic_amplitudes, n_samples,  # [1, 16000, 1] <-- [1, 250, 1], 16000
                                  method=amp_resample_method)
+  logging.debug(f"frequency_envelopes: {frequency_envelopes.shape}")
+  logging.debug(f"amplitude_envelopes: {amplitude_envelopes.shape}")
 
   # Synthesize from harmonics [batch_size, n_samples].
   logging.debug("core.harmonic_synthesis Synthesize using oscillator_bank")

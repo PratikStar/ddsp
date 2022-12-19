@@ -26,6 +26,7 @@ from ddsp import core
 from ddsp import dags
 import gin
 import tensorflow as tf
+from absl import logging
 
 tfkl = tf.keras.layers
 
