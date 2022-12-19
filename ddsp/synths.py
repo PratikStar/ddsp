@@ -84,7 +84,11 @@ class Harmonic(processors.Processor):
         However, using angular cumulative sum is slower on accelerators.
       name: Synth name.
     """
-    logging.debug(f"synths.Harmonic.init")
+    logging.debug(f"synths.Harmonic.init()")
+    logging.debug(f"\tsynths.Harmonic: n_samples={n_samples}")
+    logging.debug(f"\tsynths.Harmonic: sample_rate={sample_rate}")
+    logging.debug(f"\tsynths.Harmonic: use_angular_cumsum={use_angular_cumsum}")
+
     super().__init__(name=name)
     self.n_samples = n_samples
     self.sample_rate = sample_rate
@@ -110,7 +114,9 @@ class Harmonic(processors.Processor):
       controls: Dictionary of tensors of synthesizer controls.
     """
     logging.debug(f"synths.Harmonic.get_controls")
-    logging.debug(f"synths.Harmonic.get_controls: amplitudes: {amplitudes.shape}, harmonic_distribution: {harmonic_distribution.shape}")
+    logging.debug(f"\tsynths.Harmonic.get_controls: amplitudes: {amplitudes.shape}")
+    logging.debug(f"\tsynths.Harmonic.get_controls: harmonic_distribution: {harmonic_distribution.shape}")
+
     # Scale the amplitudes.
     # Note: Makes the amplitude and harmonics non-negative by applying a (custom) sigmoid non-linearity!!
     if self.scale_fn is not None:
@@ -143,6 +149,7 @@ class Harmonic(processors.Processor):
       signal: A tensor of harmonic waves of shape [batch, n_samples].
     """
     logging.debug(f"synths.Harmonic.get_signal")
+
     signal = core.harmonic_synthesis(
         frequencies=f0_hz,
         amplitudes=amplitudes,

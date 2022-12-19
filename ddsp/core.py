@@ -939,6 +939,8 @@ def oscillator_bank(frequency_envelopes: tf.Tensor,
       sum_sinusoids=False, else shape is [batch_size, n_samples].
   """
   logging.debug("core.oscillator_bank")
+  logging.debug(f"\tcore.oscillator_bank: sample_rate={sample_rate}")
+
   frequency_envelopes = tf_float32(frequency_envelopes)
   amplitude_envelopes = tf_float32(amplitude_envelopes)
 
@@ -1083,10 +1085,11 @@ def harmonic_synthesis(frequencies: tf.Tensor,
   """
   logging.debug("core.harmonic_synthesis()")
   logging.debug(f"core.harmonic_synthesis:  + \
-                      frequencies: {frequencies.shape} + \
-                      amplitudes: {amplitudes.shape}, + \
-                      harmonic_distribution: {harmonic_distribution.shape}, + \
-                      sample_rate: {sample_rate}")
+                      \tfrequencies: {frequencies.shape} + \
+                      \tamplitudes: {amplitudes.shape}, + \
+                      \tharmonic_distribution: {harmonic_distribution.shape}, + \
+                      \tn_samples: {n_samples}, + \
+                      \tsample_rate: {sample_rate}")
 
   frequencies = tf_float32(frequencies)
   amplitudes = tf_float32(amplitudes)
