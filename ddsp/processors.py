@@ -48,6 +48,7 @@ class Processor(tfkl.Layer):
   """
 
   def __init__(self, name: Text, trainable: bool = False):
+    logging.debug(f"processors.Processor.init")
     super().__init__(name=name, trainable=trainable, autocast=False)
 
   def call(self,
@@ -55,7 +56,8 @@ class Processor(tfkl.Layer):
            return_outputs_dict: bool = False,
            **kwargs) -> tf.Tensor:
     """Convert input tensors arguments into a signal tensor."""
-    # Don't use `training` or `mask` arguments from keras.Layer.
+    logging.debug(f"processors.Processor.call")
+  # Don't use `training` or `mask` arguments from keras.Layer.
     for k in ['training', 'mask']:
       if k in kwargs:
         _ = kwargs.pop(k)
@@ -164,15 +166,18 @@ class Add(Processor):
   """Sum two signals."""
 
   def __init__(self, name: Text = 'add'):
+    logging.debug(f"processors.Add.init")
     super().__init__(name=name)
 
   def get_controls(self, signal_one: tf.Tensor,
                    signal_two: tf.Tensor) -> TensorDict:
     """Just pass signals through."""
+    logging.debug(f"processors.Add.get_controls")
     return {'signal_one': signal_one, 'signal_two': signal_two}
 
   def get_signal(self, signal_one: tf.Tensor,
                  signal_two: tf.Tensor) -> tf.Tensor:
+    logging.debug(f"processors.Add.get_signal")
     return signal_one + signal_two
 
 

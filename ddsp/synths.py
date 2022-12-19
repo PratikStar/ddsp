@@ -18,6 +18,7 @@ from ddsp import core
 from ddsp import processors
 import gin
 import tensorflow.compat.v2 as tf
+from absl import logging
 
 
 @gin.register
@@ -83,7 +84,7 @@ class Harmonic(processors.Processor):
         However, using angular cumulative sum is slower on accelerators.
       name: Synth name.
     """
-
+    logging.debug(f"synths.Harmonic.init")
     super().__init__(name=name)
     self.n_samples = n_samples
     self.sample_rate = sample_rate
@@ -108,11 +109,15 @@ class Harmonic(processors.Processor):
     Returns:
       controls: Dictionary of tensors of synthesizer controls.
     """
+    logging.debug(f"synths.Harmonic.get_controls")
     # Scale the amplitudes.
+    # Note: Makes the amplitude and harmonics non-negative by applying a (custom) sigmoid non-linearity!!
     if self.scale_fn is not None:
       amplitudes = self.scale_fn(amplitudes)
       harmonic_distribution = self.scale_fn(harmonic_distribution)
 
+    # Note: the "harmonic_distribution" until now was just a ratio!! Not actual frequencies
+    # The below function converts the harmonic distribution to harmonic frequencies for removing the frequencies above the nyquist! BUt it does not return the frequencies!!!
     harmonic_distribution = core.normalize_harmonics(
         harmonic_distribution, f0_hz,
         self.sample_rate if self.normalize_below_nyquist else None)
@@ -136,6 +141,7 @@ class Harmonic(processors.Processor):
     Returns:
       signal: A tensor of harmonic waves of shape [batch, n_samples].
     """
+    logging.debug(f"synths.Harmonic.get_signal")
     signal = core.harmonic_synthesis(
         frequencies=f0_hz,
         amplitudes=amplitudes,
@@ -157,6 +163,7 @@ class FilteredNoise(processors.Processor):
                scale_fn=core.exp_sigmoid,
                initial_bias=-5.0,
                name='filtered_noise'):
+    logging.debug(f"synths.FilteredNoise.init")
     super().__init__(name=name)
     self.n_samples = n_samples
     self.window_size = window_size
@@ -174,6 +181,7 @@ class FilteredNoise(processors.Processor):
       controls: Dictionary of tensors of synthesizer controls.
     """
     # Scale the magnitudes.
+    logging.debug(f"synths.FilteredNoise.get_controls")
     if self.scale_fn is not None:
       magnitudes = self.scale_fn(magnitudes + self.initial_bias)
 
@@ -189,6 +197,7 @@ class FilteredNoise(processors.Processor):
     Returns:
       signal: A tensor of harmonic waves of shape [batch, n_samples, 1].
     """
+    logging.debug(f"synths.FilteredNoise.get_signal")
     batch_size = int(magnitudes.shape[0])
     signal = tf.random.uniform(
         [batch_size, self.n_samples], minval=-1.0, maxval=1.0)
@@ -269,6 +278,8 @@ class Sinusoidal(processors.Processor):
                amp_resample_method='window',
                freq_scale_fn=core.frequencies_sigmoid,
                name='sinusoidal'):
+    logging.debug(f"synths.Sinusoidal.init")
+
     super().__init__(name=name)
     self.n_samples = n_samples
     self.sample_rate = sample_rate
@@ -288,7 +299,8 @@ class Sinusoidal(processors.Processor):
     Returns:
       controls: Dictionary of tensors of synthesizer controls.
     """
-    # Scale the inputs.
+    logging.debug(f"synths.Sinusoidal.get_controls")
+  # Scale the inputs.
     if self.amp_scale_fn is not None:
       amplitudes = self.amp_scale_fn(amplitudes)
 
@@ -313,7 +325,8 @@ class Sinusoidal(processors.Processor):
     Returns:
       signal: A tensor of harmonic waves of shape [batch, n_samples].
     """
-    # Create sample-wise envelopes.
+    logging.debug(f"synths.Sinusoidal.get_signal")
+  # Create sample-wise envelopes.
     amplitude_envelopes = core.resample(amplitudes, self.n_samples,
                                         method=self.amp_resample_method)
     frequency_envelopes = core.resample(frequencies, self.n_samples)

@@ -22,6 +22,7 @@ import gin
 import numpy as np
 from scipy import fftpack
 import tensorflow.compat.v2 as tf
+from absl import logging
 
 Number = TypeVar('Number', int, float, np.ndarray, tf.Tensor)
 DB_RANGE = 80.0
@@ -895,8 +896,10 @@ def normalize_harmonics(harmonic_distribution, f0_hz=None, sample_rate=None):
   """Normalize the harmonic distribution, optionally removing above nyquist."""
   # Bandlimit the harmonic distribution.
   if sample_rate is not None and f0_hz is not None:
-    n_harmonics = int(harmonic_distribution.shape[-1])
-    harmonic_frequencies = get_harmonic_frequencies(f0_hz, n_harmonics)
+    logging.debug(f"core.normalize_harmonics Converting harmonic_distribution to harmonic_frequencies!!")
+    n_harmonics = int(harmonic_distribution.shape[-1]) # 100
+    harmonic_frequencies = get_harmonic_frequencies(f0_hz, n_harmonics) # Here you get the actual frequencies!!
+    logging.debug(f"core.normalize_harmonics removing frequencies above nyquist frequency!!")
     harmonic_distribution = remove_above_nyquist(
         harmonic_frequencies, harmonic_distribution, sample_rate)
 
@@ -1037,6 +1040,7 @@ def get_harmonic_frequencies(frequencies: tf.Tensor,
     harmonic_frequencies: Oscillator frequencies (Hz).
       Shape [batch_size, :, n_harmonics].
   """
+  logging.debug("core.get_harmonic_frequencies (Converts distribution to frequencies)")
   frequencies = tf_float32(frequencies)
 
   f_ratios = tf.linspace(1.0, float(n_harmonics), int(n_harmonics))
@@ -1075,6 +1079,7 @@ def harmonic_synthesis(frequencies: tf.Tensor,
   Returns:
     audio: Output audio. Shape [batch_size, n_samples, 1]
   """
+  logging.debug("core.harmonic_synthesis")
   frequencies = tf_float32(frequencies)
   amplitudes = tf_float32(amplitudes)
 
@@ -1088,22 +1093,26 @@ def harmonic_synthesis(frequencies: tf.Tensor,
     n_harmonics = 1
 
   # Create harmonic frequencies [batch_size, n_frames, n_harmonics].
+  logging.debug("Creating frequencies from distribution")
   harmonic_frequencies = get_harmonic_frequencies(frequencies, n_harmonics)
   if harmonic_shifts is not None:
     harmonic_frequencies *= (1.0 + harmonic_shifts)
 
   # Create harmonic amplitudes [batch_size, n_frames, n_harmonics].
   if harmonic_distribution is not None:
+    logging.debug("Creating amplitudes from distribution")
     harmonic_amplitudes = amplitudes * harmonic_distribution
   else:
     harmonic_amplitudes = amplitudes
 
   # Create sample-wise envelopes.
-  frequency_envelopes = resample(harmonic_frequencies, n_samples)  # cycles/sec
-  amplitude_envelopes = resample(harmonic_amplitudes, n_samples,
+  logging.debug("core.harmonic_synthesis Upsampling")
+  frequency_envelopes = resample(harmonic_frequencies, n_samples)  # [1, 16000, 100] <-- [1, 250, 100], 16000
+  amplitude_envelopes = resample(harmonic_amplitudes, n_samples,  # [1, 16000, 1] <-- [1, 250, 1], 16000
                                  method=amp_resample_method)
 
   # Synthesize from harmonics [batch_size, n_samples].
+  logging.debug("core.harmonic_synthesis Synthesize using oscillator_bank")
   audio = oscillator_bank(frequency_envelopes,
                           amplitude_envelopes,
                           sample_rate=sample_rate,
