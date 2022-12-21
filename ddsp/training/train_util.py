@@ -23,7 +23,7 @@ from ddsp.training import cloud
 import gin
 import tensorflow.compat.v2 as tf
 import wandb
-
+import ddsp.colab.colab_utils as colab_utils
 
 # ---------------------- Helper Functions --------------------------------------
 def get_strategy(tpu='', cluster_config=''):
@@ -345,20 +345,20 @@ def train(data_provider,
 
           out = trainer.model.val_call(next(val_dataset_iter))
           logging.debug("Out from val_call")
+
+          sample_rate = trainer.model.preprocessor.sample_rate
           # save the harmonic and noise clips
-          harmonic_output = out['harmonic']['signal']
-
+          harmonic_output = colab_utils.audio_bytes_to_np(['harmonic']['signal'].numpy(), sample_rate=sample_rate)
           wandb.log(
-            {f"harmonic-{step}": wandb.Audio(harmonic_output.numpy(), caption=f"harmonic-{step}", sample_rate=trainer.model.preprocessor.sample_rate)})
+            {f"harmonic-{step}": wandb.Audio(harmonic_output, caption=f"harmonic-{step}", sample_rate=sample_rate)})
 
-          noise_output = out['filtered_noise']['signal']
+          noise_output = out['filtered_noise']['signal'].numpy()
           wandb.log(
-            {f"noise-{step}": wandb.Audio(noise_output.numpy(), caption=f"noise-{step}", sample_rate=trainer.model.preprocessor.sample_rate)})
+            {f"noise-{step}": wandb.Audio(noise_output, caption=f"noise-{step}", sample_rate=sample_rate)})
 
-          resynth_audio = out['out']['signal']
-
+          resynth_audio = out['out']['signal'].numpy()
           wandb.log(
-            {f"resynth_audio-{step}": wandb.Audio(resynth_audio.numpy(), caption=f"resynth_audio-{step}", sample_rate=trainer.model.preprocessor.sample_rate)})
+            {f"resynth_audio-{step}": wandb.Audio(resynth_audio, caption=f"resynth_audio-{step}", sample_rate=sample_rate)})
 
         # Other things
         trainer.save(save_dir)

@@ -632,7 +632,6 @@ DEBUG=1 ddsp_run \
 --gin_file=/root/ddsp/ddsp/training/gin/eval/basic_f0_ld.gin \
 --gin_param="TFRecordProvider.file_pattern='/root/tfrecord_test_sr441k_fr252_shards10/train.tfrecord*'" \
 --gin_param="batch_size=8" \
---gin_param="steps_per_save=8" \
 --gin_param="train.steps_per_save=10" \
 --alsologtostderr \
 --gin_param="TFRecordProvider.sample_rate=44100" \
