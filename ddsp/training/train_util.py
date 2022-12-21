@@ -358,7 +358,7 @@ def train(data_provider,
             harmonic_output = harmonic_output[0]
 
           normalizer = float(np.iinfo(np.int16).max)
-          array_of_ints = np.array(np.asarray(array_of_floats) * normalizer, dtype=np.int16)
+          array_of_ints = np.array(np.asarray(harmonic_output) * normalizer, dtype=np.int16)
           wavfile.write(f"{save_dir}/audio/harmonic-{step}.wav", sample_rate, array_of_ints)
 
 
