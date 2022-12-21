@@ -16,6 +16,8 @@
 
 import json
 import os
+from ddsp import core
+
 import time
 import matplotlib.pyplot as plt
 from ddsp import spectral_ops
@@ -292,8 +294,8 @@ def train(data_provider,
     first_step = True
 
     while trainer.step < num_steps:
-      logging.debug(f"This is {trainer.step} step")
       step = trainer.step
+      logging.debug(f"This is {step.numpy()} step")
 
       # Take a step.
       losses = trainer.train_step(dataset_iter)
