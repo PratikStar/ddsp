@@ -347,14 +347,15 @@ def train(data_provider,
           logging.debug("Out from val_call")
           # save the harmonic and noise clips
           harmonic_output = out['harmonic']['signal']
-          noise_output = out['noise']['signal']
-          resynth_audio = out['out']['signal']
 
           wandb.log(
             {f"harmonic-{step}": wandb.Audio(harmonic_output.numpy(), caption=f"harmonic-{step}", sample_rate=trainer.model.preprocessor.F0LoudnessPreprocessor.sample_rate)})
 
+          noise_output = out['filtered_noise']['signal']
           wandb.log(
             {f"noise-{step}": wandb.Audio(noise_output.numpy(), caption=f"noise-{step}", sample_rate=trainer.model.preprocessor.F0LoudnessPreprocessor.sample_rate)})
+
+          resynth_audio = out['out']['signal']
 
           wandb.log(
             {f"resynth_audio-{step}": wandb.Audio(resynth_audio.numpy(), caption=f"resynth_audio-{step}", sample_rate=trainer.model.preprocessor.F0LoudnessPreprocessor.sample_rate)})
