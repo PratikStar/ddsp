@@ -17,6 +17,8 @@
 import json
 import os
 import time
+import matplotlib.pyplot as plt
+from ddsp import spectral_ops
 
 from absl import logging
 from ddsp.training import cloud
@@ -357,33 +359,12 @@ def train(data_provider,
           wandb.log({"harmonic_output-min": np.amin(harmonic_output.numpy()) })
           wandb.log({"harmonic_output-max": np.amax(harmonic_output.numpy()) })
 
-          # logging.debug(f"harmonic_output shape: {harmonic_output.shape}")
-          # logging.debug(f"harmonic_output min: {np.amin(harmonic_output.numpy())}")
-          # logging.debug(f"harmonic_output max: {np.amax(harmonic_output.numpy())}")
+          noise_output = out['filtered_noise']['signal']
+          resynth_audio = out['out']['signal']
 
-          if len(harmonic_output.shape) == 2:
-            harmonic_output = harmonic_output[0]
-
-          normalizer = float(np.iinfo(np.int16).max)
-          array_of_ints = np.array(np.asarray(harmonic_output) * normalizer, dtype=np.int16)
-
-          wavfile.write(f"{save_dir}/audio/harmonic-{str(step.numpy())}.wav", sample_rate, array_of_ints)
-
-
-          artifact = wandb.Artifact(f"audios-{run_name}", type='dataset')
-          artifact.add_file(f"{save_dir}/audio/harmonic-{str(step.numpy())}.wav")
-          wandb.log_artifact(artifact)
-
-          # wandb.log(
-          #   {f"harmonic-{step}": wandb.Audio(harmonic_output, caption=f"harmonic-{step}", sample_rate=sample_rate)})
-
-          # noise_output = out['filtered_noise']['signal'].numpy()
-          # wandb.log(
-          #   {f"noise-{step}": wandb.Audio(noise_output, caption=f"noise-{step}", sample_rate=sample_rate)})
-          #
-          # resynth_audio = out['out']['signal'].numpy()
-          # wandb.log(
-          #   {f"resynth_audio-{step}": wandb.Audio(resynth_audio, caption=f"resynth_audio-{step}", sample_rate=sample_rate)})
+          do_val_stuff("harmonic", run_name=run_name, harmonic_output, step.numpy(), save_dir=save_dir, sample_rate=sample_rate)
+          do_val_stuff("noise", run_name=run_name, noise_output, step.numpy(), save_dir=save_dir, sample_rate=sample_rate)
+          do_val_stuff("resynth_audio", run_name=run_name, resynth_audio, step.numpy(), save_dir=save_dir, sample_rate=sample_rate)
 
         # Other things
         trainer.save(save_dir)
@@ -396,23 +377,38 @@ def train(data_provider,
 
   logging.info('Training Finished!')
 
-def audio_bytes_to_np(wav_data,
-                      sample_rate=16000,
-                      normalize_db=0.1,
-                      mono=True):
-  """Convert audio file data (in bytes) into a numpy array using Pydub.
+def do_val_stuff(name, run_name, audio, step, save_dir, sample_rate=16000):
+  if len(audio.shape) == 2:
+    audio = audio[0]
 
-  Args:
-    wav_data: A byte stream of audio data.
-    sample_rate: Resample recorded audio to this sample rate.
-    normalize_db: Normalize the audio to this many decibels. Set to None to skip
-      normalization step.
-    mono: Force stereo signals to single channel. If false, output can one or
-      two channels depending on the source signal.
+  normalizer = float(np.iinfo(np.int16).max)
+  array_of_ints = np.array(np.asarray(audio) * normalizer, dtype=np.int16)
+  wavfile.write(f"{save_dir}/audio/{name}-{str(step}.wav", sample_rate, array_of_ints)
 
-  Returns:
-    An array of the recorded audio at sample_rate, shape [channels, time].
-  """
-  return note_seq.audio_io.wav_data_to_samples_pydub(
-    wav_data=wav_data, sample_rate=sample_rate, normalize_db=normalize_db,
-    num_channels=1 if mono else None)
+  artifact = wandb.Artifact(f"audios-{run_name}", type='dataset')
+  artifact.add_file(f"{save_dir}/audio/{name}-{str(step}.wav")
+  wandb.log_artifact(artifact)
+
+  # spectrogram stuff
+  spectrogram_sizes = [256, 512, 1024, 2048, 4096]
+  fig, axes = plt.subplots(nrows=5,
+                           ncols=1,
+                           sharex=False,
+                           figsize=(20, 16))
+
+  for i in range(len(spectrogram_sizes)):
+    ax = axes[i]
+    logmag = spectral_ops.compute_logmag(core.tf_float32(audio), size=512)
+    logmag = np.rot90(logmag)
+
+    ax.imshow(logmag,
+                vmin=-5,
+                vmax=1,
+                cmap=plt.cm.magma,
+                aspect='auto')
+    ax.set_xlabel(f"spectrogram for size={spectrogram_sizes[i]}")
+
+  # Save the full figure...
+  fig.savefig(f"spectrograms-{name}.png")
+
+
