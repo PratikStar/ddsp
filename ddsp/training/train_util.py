@@ -363,6 +363,7 @@ def train(data_provider,
           noise_output = out['filtered_noise']['signal']
           resynth_audio = out['out']['signal']
 
+          # do_val_stuff("original", run_name=run_name, audio=harmonic_output, step=step.numpy(), save_dir=save_dir, sample_rate=sample_rate)
           do_val_stuff("harmonic", run_name=run_name, audio=harmonic_output, step=step.numpy(), save_dir=save_dir, sample_rate=sample_rate)
           do_val_stuff("noise", run_name=run_name, audio=noise_output, step=step.numpy(), save_dir=save_dir, sample_rate=sample_rate)
           do_val_stuff("resynth_audio", run_name=run_name, audio=resynth_audio, step=step.numpy(), save_dir=save_dir, sample_rate=sample_rate)
@@ -400,7 +401,7 @@ def do_val_stuff(name, run_name, audio, step, save_dir, sample_rate=16000):
 
   for i in range(len(spectrogram_sizes)):
     ax = axes[i]
-    logmag = spectral_ops.compute_logmag(core.tf_float32(audio), size=512)
+    logmag = spectral_ops.compute_logmag(core.tf_float32(audio), size=spectrogram_sizes[i])
     logmag = np.rot90(logmag)
 
     ax.imshow(logmag,

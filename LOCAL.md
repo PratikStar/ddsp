@@ -646,7 +646,7 @@ DEBUG=1 ddsp_run \
 
 DEBUG=1 ddsp_run \
 --mode=train \
---run_name=vanilla_ae_13B_sr44k_fr250_tmp \
+--run_name=vanilla_ae_13B_sr44k_fr250_loss4096 \
 --gin_file=/root/ddsp/ddsp/training/gin/models/ae.gin \
 --gin_file=/root/ddsp/ddsp/training/gin/datasets/tfrecord.gin \
 --gin_file=/root/ddsp/ddsp/training/gin/eval/basic_f0_ld.gin \
