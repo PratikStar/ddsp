@@ -373,7 +373,7 @@ def train(data_provider,
   logging.info('Training Finished!')
 
 def audio_bytes_to_np(wav_data,
-                      sample_rate=DEFAULT_SAMPLE_RATE,
+                      sample_rate=16000,
                       normalize_db=0.1,
                       mono=True):
   """Convert audio file data (in bytes) into a numpy array using Pydub.
