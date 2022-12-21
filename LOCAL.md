@@ -644,15 +644,15 @@ DEBUG=1 ddsp_run \
 --gin_param='F0LoudnessPreprocessor.sample_rate=44100' \
 --gin_param="TFRecordProvider.frame_rate=252"
 
-
 DEBUG=1 ddsp_run \
 --mode=train \
---run_name=vanilla_ae_13B_sr44k_fr250 \
+--run_name=vanilla_ae_13B_sr44k_fr250_tmp \
 --gin_file=/root/ddsp/ddsp/training/gin/models/ae.gin \
 --gin_file=/root/ddsp/ddsp/training/gin/datasets/tfrecord.gin \
 --gin_file=/root/ddsp/ddsp/training/gin/eval/basic_f0_ld.gin \
 --gin_param="TFRecordProvider.file_pattern='/root/tfrecord_13B_sr44k_fr250/train.tfrecord*'" \
 --gin_param="batch_size=8" \
+--gin_param="train.steps_per_save=2" \
 --alsologtostderr \
 --gin_param="TFRecordProvider.sample_rate=44000" \
 --gin_param="Harmonic.sample_rate=44000" \
@@ -660,6 +660,5 @@ DEBUG=1 ddsp_run \
 --gin_param="Harmonic.n_samples=176000" \
 --gin_param='F0LoudnessPreprocessor.time_steps=1000' \
 --gin_param='F0LoudnessPreprocessor.frame_rate=250' \
---gin_param='F0LoudnessPreprocessor.sample_rate=44000' \
---gin_param="oscillator_bank.use_angular_cumsum=True" \
---gin_param="TFRecordProvider.frame_rate=250" >> ~/logs/ddsp_run-vanilla_ae_13B_sr44k_fr250_$(date +%Y%m%d_%H%M%S).log 2>&1 &
+--gin_param='F0LoudnessPreprocessor.sample_rate=44000' \  --gin_param='oscillator_bank.use_angular_cumsum=True' \
+--gin_param="TFRecordProvider.frame_rate=250"
