@@ -340,6 +340,9 @@ def train(data_provider,
       # Save Model.
       if step % steps_per_save == 0 and save_dir:
         if validation_data_provider is not None:
+          import io
+          from scipy.io import wavfile
+
           val_dataset = validation_data_provider.get_batch(1, shuffle=True, repeats=-1)
           val_dataset_iter = iter(val_dataset)
           print(f"val_dataset_iter: {val_dataset_iter}")
@@ -349,9 +352,22 @@ def train(data_provider,
 
           sample_rate = trainer.model.preprocessor.sample_rate
           # save the harmonic and noise clips
-          harmonic_output =out['harmonic']['signal'].numpy()
-          wandb.log(
-            {f"harmonic-{step}": wandb.Audio(harmonic_output, caption=f"harmonic-{step}", sample_rate=sample_rate)})
+          harmonic_output =out['harmonic']['signal']
+
+          if len(harmonic_output.shape) == 2:
+            harmonic_output = harmonic_output[0]
+
+          normalizer = float(np.iinfo(np.int16).max)
+          array_of_ints = np.array(np.asarray(array_of_floats) * normalizer, dtype=np.int16)
+          wavfile.write(f"{save_dir}/audio/harmonic-{step}.wav", sample_rate, array_of_ints)
+
+
+          artifact = wandb.Artifact(f"audio-{step}", type='dataset')
+          artifact.add_file(f"{save_dir}/audio/harmonic-{step}.wav")
+          wandb.log_artifact(artifact)
+
+          # wandb.log(
+          #   {f"harmonic-{step}": wandb.Audio(harmonic_output, caption=f"harmonic-{step}", sample_rate=sample_rate)})
 
           # noise_output = out['filtered_noise']['signal'].numpy()
           # wandb.log(
