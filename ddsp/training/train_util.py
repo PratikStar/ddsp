@@ -349,17 +349,17 @@ def train(data_provider,
 
           sample_rate = trainer.model.preprocessor.sample_rate
           # save the harmonic and noise clips
-          harmonic_output = audio_bytes_to_np(out['harmonic']['signal'], sample_rate=sample_rate)
+          harmonic_output =out['harmonic']['signal'].numpy()
           wandb.log(
             {f"harmonic-{step}": wandb.Audio(harmonic_output, caption=f"harmonic-{step}", sample_rate=sample_rate)})
 
-          noise_output = out['filtered_noise']['signal'].numpy()
-          wandb.log(
-            {f"noise-{step}": wandb.Audio(noise_output, caption=f"noise-{step}", sample_rate=sample_rate)})
-
-          resynth_audio = out['out']['signal'].numpy()
-          wandb.log(
-            {f"resynth_audio-{step}": wandb.Audio(resynth_audio, caption=f"resynth_audio-{step}", sample_rate=sample_rate)})
+          # noise_output = out['filtered_noise']['signal'].numpy()
+          # wandb.log(
+          #   {f"noise-{step}": wandb.Audio(noise_output, caption=f"noise-{step}", sample_rate=sample_rate)})
+          #
+          # resynth_audio = out['out']['signal'].numpy()
+          # wandb.log(
+          #   {f"resynth_audio-{step}": wandb.Audio(resynth_audio, caption=f"resynth_audio-{step}", sample_rate=sample_rate)})
 
         # Other things
         trainer.save(save_dir)
