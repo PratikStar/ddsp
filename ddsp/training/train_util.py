@@ -355,12 +355,18 @@ def train(data_provider,
           # save the harmonic and noise clips
           harmonic_output =out['harmonic']['signal']
 
+          logging.debug(f"harmonic_output shape: {harmonic_output.shape}")
+          logging.debug(f"harmonic_output min: {min(harmonic_output)}")
+          logging.debug(f"harmonic_output max: {max(harmonic_output)}")
+
           if len(harmonic_output.shape) == 2:
             harmonic_output = harmonic_output[0]
 
           normalizer = float(np.iinfo(np.int16).max)
           array_of_ints = np.array(np.asarray(harmonic_output) * normalizer, dtype=np.int16)
-          wavfile.write(f"{save_dir}/audio/harmonic-{str(step.numpy())}.wav", sample_rate, array_of_ints)
+
+          wavfile.write(f"{save_dir}/audio/harmonic-{str(step.numpy())}.wav", sample_rate, harmonic_output)
+          wavfile.write(f"{save_dir}/audio/array_of_ints-{str(step.numpy())}.wav", sample_rate, array_of_ints)
 
 
           artifact = wandb.Artifact(f"audios-{run_name}", type='dataset')
