@@ -622,3 +622,24 @@ ddsp_run \
   --gin_param='F0LoudnessPreprocessor.frame_rate=250' \
   --gin_param='F0LoudnessPreprocessor.sample_rate=32000' \
   --gin_param="TFRecordProvider.frame_rate=250"
+
+
+DEBUG=1 ddsp_run \
+--mode=train \
+--run_name=ae_rnn_last_test_sr441k_fr252 \
+--gin_file=/root/ddsp/ddsp/training/gin/models/ae_mfccRnnEncoder_last.gin \
+--gin_file=/root/ddsp/ddsp/training/gin/datasets/tfrecord.gin \
+--gin_file=/root/ddsp/ddsp/training/gin/eval/basic_f0_ld.gin \
+--gin_param="TFRecordProvider.file_pattern='/root/tfrecord_test_sr441k_fr252_shards10/train.tfrecord*'" \
+--gin_param="batch_size=8" \
+--gin_param="steps_per_save=8" \
+--gin_param="train.steps_per_save=10" \
+--alsologtostderr \
+--gin_param="TFRecordProvider.sample_rate=44100" \
+--gin_param="Harmonic.sample_rate=44100" \
+--gin_param="FilteredNoise.n_samples=176400" \
+--gin_param="Harmonic.n_samples=176400" \
+--gin_param='F0LoudnessPreprocessor.time_steps=1008' \
+--gin_param='F0LoudnessPreprocessor.frame_rate=252' \
+--gin_param='F0LoudnessPreprocessor.sample_rate=44100' \
+--gin_param="TFRecordProvider.frame_rate=252"

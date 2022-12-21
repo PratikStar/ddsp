@@ -220,7 +220,7 @@ def train(data_provider,
           batch_size=32,
           num_steps=1000000,
           steps_per_summary=300,
-          steps_per_save=50,
+          steps_per_save=300,
           save_dir='/tmp/ddsp',
           restore_dir='/tmp/ddsp',
           early_stop_loss_value=None,
@@ -344,11 +344,11 @@ def train(data_provider,
           print(f"val_dataset_iter: {val_dataset_iter}")
 
           out = trainer.model.val_call(next(val_dataset_iter))
-
+          logging.debug("Out from val_call")
           # save the harmonic and noise clips
-          harmonic_output = pg_out['harmonic']['signal']
-          noise_output = pg_out['noise']['signal']
-          resynth_audio = pg_out['out']['signal']
+          harmonic_output = out['harmonic']['signal']
+          noise_output = out['noise']['signal']
+          resynth_audio = out['out']['signal']
 
           wandb.log(
             {f"harmonic-{step}": wandb.Audio(harmonic_output.numpy(), caption=f"harmonic-{step}", sample_rate=trainer.model.preprocessor.F0LoudnessPreprocessor.sample_rate)})
