@@ -25,8 +25,8 @@ from ddsp.training import cloud
 import gin
 import tensorflow.compat.v2 as tf
 import wandb
-
-import note_seq
+import io
+from scipy.io import wavfile
 import numpy as np
 # ---------------------- Helper Functions --------------------------------------
 def get_strategy(tpu='', cluster_config=''):
@@ -343,8 +343,7 @@ def train(data_provider,
       # Save Model.
       if step % steps_per_save == 0 and save_dir:
         if validation_data_provider is not None:
-          import io
-          from scipy.io import wavfile
+
 
           val_dataset = validation_data_provider.get_batch(1, shuffle=True, repeats=-1)
           val_dataset_iter = iter(val_dataset)
