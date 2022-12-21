@@ -940,6 +940,7 @@ def oscillator_bank(frequency_envelopes: tf.Tensor,
   """
   logging.debug("core.oscillator_bank")
   logging.debug(f"\tcore.oscillator_bank: sample_rate={sample_rate}")
+  logging.debug(f"\tcore.oscillator_bank: use_angular_cumsum={use_angular_cumsum}")
 
   frequency_envelopes = tf_float32(frequency_envelopes)
   amplitude_envelopes = tf_float32(amplitude_envelopes)
