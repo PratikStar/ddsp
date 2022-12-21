@@ -359,11 +359,11 @@ def train(data_provider,
 
           normalizer = float(np.iinfo(np.int16).max)
           array_of_ints = np.array(np.asarray(harmonic_output) * normalizer, dtype=np.int16)
-          wavfile.write(f"{save_dir}/audio/harmonic-{step}.wav", sample_rate, array_of_ints)
+          wavfile.write(f"{save_dir}/audio/harmonic-{str(step.numpy())}.wav", sample_rate, array_of_ints)
 
 
-          artifact = wandb.Artifact(f"audio-{step}", type='dataset')
-          artifact.add_file(f"{save_dir}/audio/harmonic-{step}.wav")
+          artifact = wandb.Artifact(f"audio-{str(step.numpy())}", type='dataset')
+          artifact.add_file(f"{save_dir}/audio/harmonic-{str(step.numpy())}.wav")
           wandb.log_artifact(artifact)
 
           # wandb.log(
