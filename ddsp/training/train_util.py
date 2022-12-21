@@ -218,6 +218,7 @@ def write_gin_config(summary_writer, save_dir, step, run_name):
 def train(data_provider,
           trainer,
           validation_data_provider=None,
+          run_name="dummy_run_name",
           batch_size=32,
           num_steps=1000000,
           steps_per_summary=300,
@@ -362,7 +363,7 @@ def train(data_provider,
           wavfile.write(f"{save_dir}/audio/harmonic-{str(step.numpy())}.wav", sample_rate, array_of_ints)
 
 
-          artifact = wandb.Artifact(f"audio-{str(step.numpy())}", type='dataset')
+          artifact = wandb.Artifact(f"audios-{run_name}", type='dataset')
           artifact.add_file(f"{save_dir}/audio/harmonic-{str(step.numpy())}.wav")
           wandb.log_artifact(artifact)
 
