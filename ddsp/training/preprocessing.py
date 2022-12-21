@@ -86,8 +86,8 @@ class F0LoudnessPreprocessor(nn.DictLayer):
           frame_rate=self.frame_rate)
 
 
-    logging.debug(f"f0_hz: {f0_hz}")
-    logging.debug(f"loudness_db: {loudness_db}")
+    logging.debug(f"f0_hz shape: {f0_hz.shape}")
+    logging.debug(f"loudness_db shape: {loudness_db.shape}")
     # Resample features to the frame_rate.
     f0_hz = self.resample(f0_hz)
     loudness_db = self.resample(loudness_db)
