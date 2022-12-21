@@ -216,6 +216,7 @@ def write_gin_config(summary_writer, save_dir, step, run_name):
 @gin.configurable
 def train(data_provider,
           trainer,
+          validation_data_provider=None,
           batch_size=32,
           num_steps=1000000,
           steps_per_summary=300,
@@ -337,6 +338,22 @@ def train(data_provider,
 
       # Save Model.
       if step % steps_per_save == 0 and save_dir:
+
+
+        val_dataset = validation_data_provider.get_batch(1, shuffle=True, repeats=-1)
+        val_dataset_iter = iter(val_dataset)
+        print(f"val_dataset_iter: {val_dataset_iter}")
+
+        out = trainer.model.val_call(next(val_dataset_iter))
+
+        # save the harmonic and noise clips
+        harmonic_output = pg_out['harmonic']['signal']
+        noise_output = pg_out['noise']['signal']
+        resynth_audio = pg_out['out']['signal']
+
+
+
+        # Other things
         trainer.save(save_dir)
         summary_writer.flush()
 

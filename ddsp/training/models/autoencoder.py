@@ -97,6 +97,27 @@ class Autoencoder(Model):
 
         logging.debug(f"Output features from AUTOENCODER are as below: ")
         for k, v in outputs.items():
-            logging.debug(f"\t{k} 's shape--> {v.shape}")
+            if type(v) != dict:
+                logging.debug(f"\t{k} 's shape--> {v.shape}")
         logging.debug(f"Autoencoder, returning!")
+        return outputs
+
+    def val_call(self, features, training=False):
+        """Run the core of the network, get predictions and loss."""
+        logging.debug(f"Autoencoder.val_call")
+        features = self.encode(features, training=training)
+        features.update(self.decoder(features, training=training))
+
+        logging.debug(f"Autoencoder, now through processor groups")
+        # Run through processor group.
+        pg_out = self.processor_group(features, return_outputs_dict=True)
+
+        # Parse outputs
+        outputs = pg_out['controls']
+        outputs['audio_synth'] = pg_out['signal']
+
+        # logging.debug(f"Output features from AUTOENCODER are as below: ")
+        # for k, v in outputs.items():
+        #     logging.debug(f"\t{k} 's shape--> {v.shape}")
+        # logging.debug(f"Autoencoder, returning!")
         return outputs
