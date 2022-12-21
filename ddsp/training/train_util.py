@@ -383,10 +383,10 @@ def do_val_stuff(name, run_name, audio, step, save_dir, sample_rate=16000):
 
   normalizer = float(np.iinfo(np.int16).max)
   array_of_ints = np.array(np.asarray(audio) * normalizer, dtype=np.int16)
-  wavfile.write(f"{save_dir}/audio/{name}-{str(step}.wav", sample_rate, array_of_ints)
+  wavfile.write(f"{save_dir}/audio/{name}-{str(step)}.wav", sample_rate, array_of_ints)
 
   artifact = wandb.Artifact(f"audios-{run_name}", type='dataset')
-  artifact.add_file(f"{save_dir}/audio/{name}-{str(step}.wav")
+  artifact.add_file(f"{save_dir}/audio/{name}-{str(step)}.wav")
   wandb.log_artifact(artifact)
 
   # spectrogram stuff
