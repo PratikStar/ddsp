@@ -338,27 +338,26 @@ def train(data_provider,
 
       # Save Model.
       if step % steps_per_save == 0 and save_dir:
+        if validation_data_provider is not None:
+          val_dataset = validation_data_provider.get_batch(1, shuffle=True, repeats=-1)
+          val_dataset_iter = iter(val_dataset)
+          print(f"val_dataset_iter: {val_dataset_iter}")
 
+          out = trainer.model.val_call(next(val_dataset_iter))
 
-        val_dataset = validation_data_provider.get_batch(1, shuffle=True, repeats=-1)
-        val_dataset_iter = iter(val_dataset)
-        print(f"val_dataset_iter: {val_dataset_iter}")
+          # save the harmonic and noise clips
+          harmonic_output = pg_out['harmonic']['signal']
+          noise_output = pg_out['noise']['signal']
+          resynth_audio = pg_out['out']['signal']
 
-        out = trainer.model.val_call(next(val_dataset_iter))
+          wandb.log(
+            {f"harmonic-{step}": wandb.Audio(harmonic_output.numpy(), caption=f"harmonic-{step}", sample_rate=trainer.model.preprocessor.F0LoudnessPreprocessor.sample_rate)})
 
-        # save the harmonic and noise clips
-        harmonic_output = pg_out['harmonic']['signal']
-        noise_output = pg_out['noise']['signal']
-        resynth_audio = pg_out['out']['signal']
+          wandb.log(
+            {f"noise-{step}": wandb.Audio(noise_output.numpy(), caption=f"noise-{step}", sample_rate=trainer.model.preprocessor.F0LoudnessPreprocessor.sample_rate)})
 
-        wandb.log(
-          {f"harmonic-{step}": wandb.Audio(harmonic_output.numpy(), caption=f"harmonic-{step}", sample_rate=trainer.model.preprocessor.F0LoudnessPreprocessor.sample_rate)})
-
-        wandb.log(
-          {f"noise-{step}": wandb.Audio(noise_output.numpy(), caption=f"noise-{step}", sample_rate=trainer.model.preprocessor.F0LoudnessPreprocessor.sample_rate)})
-
-        wandb.log(
-          {f"resynth_audio-{step}": wandb.Audio(resynth_audio.numpy(), caption=f"resynth_audio-{step}", sample_rate=trainer.model.preprocessor.F0LoudnessPreprocessor.sample_rate)})
+          wandb.log(
+            {f"resynth_audio-{step}": wandb.Audio(resynth_audio.numpy(), caption=f"resynth_audio-{step}", sample_rate=trainer.model.preprocessor.F0LoudnessPreprocessor.sample_rate)})
 
         # Other things
         trainer.save(save_dir)

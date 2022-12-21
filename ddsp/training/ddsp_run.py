@@ -213,6 +213,7 @@ def main(unused_argv):
 
     logging.debug("calling train_util.train")
     train_util.train(data_provider=gin.REQUIRED,
+                     validation_data_provider=gin.REQUIRED,
                      trainer=trainer,
                      save_dir=save_dir,
                      restore_dir=restore_dir,
