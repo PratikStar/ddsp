@@ -45,7 +45,7 @@ Autoencoder.losses = [
 SpectralLoss.loss_type = 'L1'
 SpectralLoss.mag_weight = 1.0
 SpectralLoss.logmag_weight = 1.0
-
+SpectralLoss.fft_sizes = (4096, 2048, 1024, 512, 256, 128, 64)
 
 
 
