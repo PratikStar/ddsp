@@ -349,7 +349,7 @@ def train(data_provider,
 
           sample_rate = trainer.model.preprocessor.sample_rate
           # save the harmonic and noise clips
-          harmonic_output = audio_bytes_to_np(['harmonic']['signal'], sample_rate=sample_rate)
+          harmonic_output = audio_bytes_to_np(out['harmonic']['signal'], sample_rate=sample_rate)
           wandb.log(
             {f"harmonic-{step}": wandb.Audio(harmonic_output, caption=f"harmonic-{step}", sample_rate=sample_rate)})
 
