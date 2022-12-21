@@ -384,10 +384,11 @@ def do_val_stuff(name, run_name, audio, step, save_dir, sample_rate=16000):
 
   normalizer = float(np.iinfo(np.int16).max)
   array_of_ints = np.array(np.asarray(audio) * normalizer, dtype=np.int16)
-  wavfile.write(f"{save_dir}/audio/{name}-{str(step)}.wav", sample_rate, array_of_ints)
+  audio_file = f"{save_dir}/audio/{name}-{str(step)}.wav"
+  wavfile.write(audio_file, sample_rate, array_of_ints)
 
   artifact = wandb.Artifact(f"audios-{run_name}", type='dataset')
-  artifact.add_file(f"{save_dir}/audio/{name}-{str(step)}.wav")
+  artifact.add_file(audio_file)
   wandb.log_artifact(artifact)
 
   # spectrogram stuff
@@ -409,7 +410,9 @@ def do_val_stuff(name, run_name, audio, step, save_dir, sample_rate=16000):
                 aspect='auto')
     ax.set_xlabel(f"spectrogram for size={spectrogram_sizes[i]}")
 
-  # Save the full figure...
-  fig.savefig(f"spectrograms-{name}.png")
+  image_file = f"{save_dir}/spectrograms/{name}-{str(step)}.png"
+  fig.savefig(image_file)
+
+  wandb.log({f"{name}-{str(step)}": wandb.Image(image_file)})
 
 
