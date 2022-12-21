@@ -194,6 +194,7 @@ def main(unused_argv):
   logging.info('Save Dir: %s', save_dir)
 
   gfile.makedirs(restore_dir)  # Only makes dirs if they don't exist.
+  gfile.makedirs(os.path.join(save_dir, "audio"))  # Only makes dirs if they don't exist.
   parse_gin(restore_dir)
 
   logging.info('Operative Gin Config:\n%s', gin.config.config_str())
