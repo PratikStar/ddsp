@@ -351,7 +351,14 @@ def train(data_provider,
         noise_output = pg_out['noise']['signal']
         resynth_audio = pg_out['out']['signal']
 
+        wandb.log(
+          {f"harmonic-{step}": wandb.Audio(harmonic_output.numpy(), caption=f"harmonic-{step}", sample_rate=trainer.model.preprocessor.F0LoudnessPreprocessor.sample_rate)})
 
+        wandb.log(
+          {f"noise-{step}": wandb.Audio(noise_output.numpy(), caption=f"noise-{step}", sample_rate=trainer.model.preprocessor.F0LoudnessPreprocessor.sample_rate)})
+
+        wandb.log(
+          {f"resynth_audio-{step}": wandb.Audio(resynth_audio.numpy(), caption=f"resynth_audio-{step}", sample_rate=trainer.model.preprocessor.F0LoudnessPreprocessor.sample_rate)})
 
         # Other things
         trainer.save(save_dir)
