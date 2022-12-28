@@ -345,28 +345,27 @@ def train(data_provider,
       # Save Model.
       if step % steps_per_save == 0 and save_dir:
         if validation_data_provider is not None:
-
-
           val_dataset = validation_data_provider.get_batch(1, shuffle=True, repeats=-1)
           val_dataset_iter = iter(val_dataset)
           print(f"val_dataset_iter: {val_dataset_iter}")
-
           out = trainer.model.val_call(next(val_dataset_iter))
-          logging.debug("Out from val_call")
+        else:
+          out = trainer.model.val_call(next(iter(data_provider.get_batch(1, shuffle=True, repeats=-1))))
 
-          sample_rate = trainer.model.preprocessor.sample_rate
-          # save the harmonic and noise clips
-          harmonic_output = out['harmonic']['signal']
-          wandb.log({"harmonic_output-min": np.amin(harmonic_output.numpy()) })
-          wandb.log({"harmonic_output-max": np.amax(harmonic_output.numpy()) })
+        logging.debug("Out from val_call")
 
-          noise_output = out['filtered_noise']['signal']
-          resynth_audio = out['out']['signal']
+        sample_rate = trainer.model.preprocessor.sample_rate
+        # save the harmonic and noise clips
+        harmonic_output = out['harmonic']['signal']
+        wandb.log({"harmonic_output-min": np.amin(harmonic_output.numpy()) })
+        wandb.log({"harmonic_output-max": np.amax(harmonic_output.numpy()) })
 
-          # do_val_stuff("original", run_name=run_name, audio=harmonic_output, step=step.numpy(), save_dir=save_dir, sample_rate=sample_rate)
-          do_val_stuff("harmonic", run_name=run_name, audio=harmonic_output, step=step.numpy(), save_dir=save_dir, sample_rate=sample_rate)
-          do_val_stuff("noise", run_name=run_name, audio=noise_output, step=step.numpy(), save_dir=save_dir, sample_rate=sample_rate)
-          do_val_stuff("resynth_audio", run_name=run_name, audio=resynth_audio, step=step.numpy(), save_dir=save_dir, sample_rate=sample_rate)
+        noise_output = out['filtered_noise']['signal']
+        resynth_audio = out['out']['signal']
+
+        do_val_stuff("harmonic", run_name=run_name, audio=harmonic_output, step=step.numpy(), save_dir=save_dir, sample_rate=sample_rate)
+        do_val_stuff("noise", run_name=run_name, audio=noise_output, step=step.numpy(), save_dir=save_dir, sample_rate=sample_rate)
+        do_val_stuff("resynth_audio", run_name=run_name, audio=resynth_audio, step=step.numpy(), save_dir=save_dir, sample_rate=sample_rate)
 
         # Other things
         trainer.save(save_dir)

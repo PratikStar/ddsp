@@ -177,7 +177,7 @@ def allow_memory_growth():
 def main(unused_argv):
   """Parse gin config and run ddsp training, evaluation, or sampling."""
   run_name = FLAGS.run_name
-  wandb.init(project='ddsp', entity='auditory-grounding', tags=[run_name])
+  wandb.init(project=f"ddsp-{run_name}", entity='auditory-grounding', tags=[run_name])
 
   restore_dir = os.path.expanduser(FLAGS.restore_dir + run_name)
   save_dir = os.path.expanduser(FLAGS.save_dir + run_name)
