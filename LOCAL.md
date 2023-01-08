@@ -207,12 +207,13 @@ python /root/ddsp/ddsp/training/data_preparation/ddsp_prepare_tfrecord.py \
 --num_shards=10 \
 --alsologtostderr >> ~/logs/data_prep_$(date +%Y%m%d_%H%M%S).log 2>&1 &
 
-# new GCP account
-python /root/ddsp/ddsp/training/data_preparation/ddsp_prepare_tfrecord.py \
---input_audio_filepatterns='/root/buckets/pratik-ddsp2-data/monophonic-passagebased/*wav' \
+# new GCP account. f0 from di stuff
+DEBUG=1 python /root/ddsp/ddsp/training/data_preparation/ddsp_prepare_tfrecord.py \
+--input_audio_filepatterns='/root/buckets/pratik-ddsp2-data/monophonic-passagebased/09*wav' \
 --output_tfrecord_path=/root/tfrecord/train.tfrecord \
 --chunk_secs=0.0 \
 --num_shards=10 \
+--f0_from_di=True \
 --alsologtostderr
 ```
 ### just download tfrecords from wisteria to test ddsp_run
