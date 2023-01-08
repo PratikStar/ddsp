@@ -104,6 +104,7 @@ def _get_f0_estimate_from_di(ex, frame_rate, center, viterbi):
         raise Exception('Exception while parsing the passage number')
     di_audio_path = "/".join(ex['audio_path'].split("/")[:-1]) + f"/09A DI - {passage} .wav"
     if di_audio_path not in di_f0_estimates:
+        logging.debug(f"keys of di_f0_estimates: {di_f0_estimates.keys()}")
         logging.debug(f"DI's corresponding f0 estimate not found for file {filename}, so calculating...")
         di_audio = _load_audio_as_array(di_audio_path, CREPE_SAMPLE_RATE)
         padding = 'center' if center else 'same'
