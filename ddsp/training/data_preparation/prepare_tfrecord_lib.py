@@ -20,10 +20,11 @@ from ddsp import spectral_ops
 import numpy as np
 import pydub
 import tensorflow.compat.v2 as tf
+import sys
 
 CREPE_SAMPLE_RATE = spectral_ops.CREPE_SAMPLE_RATE  # 16kHz.
 
-
+di_f0_estimates = {}
 def _load_audio_as_array(audio_path, sample_rate):
     """Load audio file at specified sample rate and return an array.
 
@@ -93,15 +94,47 @@ def _chunk_audio(ex, sample_rate, chunk_secs):
         yield {'audio': chunks[i], 'audio_16k': chunks_16k[i]}
 
 
-def _add_f0_estimate(ex, frame_rate, center, viterbi):
+def _get_f0_estimate_from_di(ex, frame_rate, center, viterbi):
     """Add fundamental frequency (f0) estimate using CREPE."""
+    global di_f0_estimates
+    logging.debug(f"In _get_f0_estimate_from_di, keys of example: {ex.keys}")
+    filename = ex['audio_path'].split('/')[-1].split(" ")[-2]
+    passage = filename.split(" ")[-2]
+    if not passage.isnumeric():
+        raise Exception('Exception while parsing the passage number')
+    di_audio_path = "/".join(ex['audio_path'].split("/")[:-1]) + f"/09A DI - {passage} .wav"
+    if di_audio_path not in di_f0_estimates:
+        logging.debug(f"DI's corresponding f0 estimate not found for file {filename}, so calculating...")
+        di_audio = _load_audio_as_array(di_audio_path, CREPE_SAMPLE_RATE)
+        padding = 'center' if center else 'same'
+        f0_hz, f0_confidence = spectral_ops.compute_f0(
+            di_audio, frame_rate, viterbi=viterbi, padding=padding)
+        di_f0_estimates[di_audio_path] = {
+            'f0_hz': f0_hz,
+            'f0_confidence': f0_confidence
+        }
+    else:
+        f0_hz = di_f0_estimates[di_audio_path]['f0_hz']
+        f0_confidence = di_f0_estimates[di_audio_path]['f0_confidence']
+
+    return f0_hz, f0_confidence
+
+
+def _add_f0_estimate(ex, frame_rate, center, viterbi, from_di=False):
+    """Add fundamental frequency (f0) estimate using CREPE."""
+    logging.debug(f"In _add_f0_estimate, keys of example: {ex.keys}")
     beam.metrics.Metrics.counter('prepare-tfrecord', 'estimate-f0').inc()
     audio = ex['audio_16k']
     padding = 'center' if center else 'same'
     logging.debug(f"Estimating f0")
     # logging.debug(f"Audio frame_count: {audio.frame_count()}")
-    f0_hz, f0_confidence = spectral_ops.compute_f0(
-        audio, frame_rate, viterbi=viterbi, padding=padding)
+    if from_di:
+        logging.debug("Getting f0 estimate from DI")
+        f0_hz, f0_confidence =  _get_f0_estimate_from_di(ex, frame_rate, center, viterbi)
+    else:
+        f0_hz, f0_confidence = spectral_ops.compute_f0(
+            audio, frame_rate, viterbi=viterbi, padding=padding)
+
     logging.debug(f"\tf0 estimate from CREPE: {f0_hz}")
     logging.debug(f"\tf0 estimate from CREPE shape: {f0_hz.shape}")
 
@@ -199,6 +232,7 @@ def prepare_tfrecord(input_audio_paths,
                      chunk_secs=20.0,
                      center=False,
                      viterbi=True,
+                     f0_from_di=False,
                      pipeline_options=''):
     """Prepares a TFRecord for use in training, evaluation, and prediction.
 
@@ -228,6 +262,7 @@ def prepare_tfrecord(input_audio_paths,
     center: Provide zero-padding to audio so that frame timestamps will be
       centered.
     viterbi: Use viterbi decoding of pitch.
+    f0_from_di: get f0 from di
     pipeline_options: An iterable of command line arguments to be used as
       options for the Beam Pipeline.
   """
@@ -279,7 +314,8 @@ def prepare_tfrecord(input_audio_paths,
                     | beam.Map(_add_f0_estimate,
                                frame_rate=frame_rate,
                                center=center,
-                               viterbi=viterbi)
+                               viterbi=viterbi,
+                               from_di=f0_from_di)
                     | beam.Map(_add_loudness,
                                frame_rate=frame_rate,
                                n_fft=512,

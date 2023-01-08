@@ -150,6 +150,10 @@ sudo apt-get install --no-install-recommends libnvinfer6=6.0.1-1+cuda10.1 \
 
 
 # GCP
+gcloud auth login
+gcloud config set project ddsp2-374016
+gcloud compute ssh --ssh-flag="-ServerAliveInterval=30" --zone us-east1-c instance-gpu
+
 ```shell
 sudo su
 
@@ -158,7 +162,7 @@ apt-get install git
 apt-get install wget
 # install miniconda: https://docs.conda.io/projects/conda/en/latest/user-guide/install/linux.html
 wget https://repo.anaconda.com/miniconda/Miniconda3-py39_4.12.0-Linux-x86_64.sh
-bash Miniconda3
+bash Miniconda3<tab>
 source /root/.bashrc
 
 sudo apt-get install libsndfile-dev
@@ -167,6 +171,7 @@ pip install --upgrade pip
 pip install tensorflow==2.11.0rc0
 pip install apache-beam wandb
 pip install --upgrade ddsp
+mkdir ~/buckets ~/logs
 
 ssh-keygen
 <add key to github>
@@ -174,8 +179,8 @@ git clone git@github.com:PratikStar/ddsp.git
 cd ddsp
 pip install .
 
-mkdir ~/buckets ~/logs
 gsutil -u ddsp-366504 cp -r gs://pratik-ddsp-data ~/buckets
+gsutil -u ddsp2-374016 cp -r gs://pratik-ddsp2-data ~/buckets
 #gsutil -> https://hartwigmedical.github.io/documentation/accessing-hartwig-data-through-gcp.html#accessing-data THIS works!!
 
 
@@ -186,7 +191,7 @@ gsutil -u ddsp-366504 cp -r gs://pratik-ddsp-data ~/buckets
 
 ## data prep
 
-
+```shell
 ddsp_prepare_tfrecord \
 --input_audio_filepatterns='/root/buckets/pratik-ddsp-data/monophonic/*wav' \
 --output_tfrecord_path=/root/tfrecord/train.tfrecord \
@@ -202,6 +207,14 @@ python /root/ddsp/ddsp/training/data_preparation/ddsp_prepare_tfrecord.py \
 --num_shards=10 \
 --alsologtostderr >> ~/logs/data_prep_$(date +%Y%m%d_%H%M%S).log 2>&1 &
 
+# new GCP account
+python /root/ddsp/ddsp/training/data_preparation/ddsp_prepare_tfrecord.py \
+--input_audio_filepatterns='/root/buckets/pratik-ddsp2-data/monophonic-passagebased/*wav' \
+--output_tfrecord_path=/root/tfrecord/train.tfrecord \
+--chunk_secs=0.0 \
+--num_shards=10 \
+--alsologtostderr
+```
 ### just download tfrecords from wisteria to test ddsp_run
 rsync -av w:/work/gk77/k77021/data/ddsp/monophonic "/Users/pratik/data/ddsp_tfrecords"
 
@@ -256,12 +269,6 @@ ddsp_run \
 gcloud compute ssh instance-1 --ssh-flag="-ServerAliveInterval=30" --zone us-east1-b --command "sudo expand-root.sh /dev/sda 1 ext4"
 
 wget https://developer.download.nvidia.com/compute/cuda/repos/debian11/x86_64/cuda-keyring_1.0-1_all.deb
-
-## ddsp_run on AI Platform
-
-
-[comment]: <> (https://console.cloud.google.com/ai-platform/jobs?authuser=1&project=ddsp-366504)
-
 
 ### tensorboard
 [comment]: <> (https://www.montefischer.com/2020/02/20/tensorboard-with-gcp.html)
