@@ -142,7 +142,7 @@ class SpectralLoss(Loss):
   """
 
   def __init__(self,
-               fft_sizes=(4096, 2048, 1024, 512, 256, 128, 64),
+               fft_sizes=(2048, 1024, 512, 256, 128, 64),
                loss_type='L1',
                mag_weight=1.0,
                delta_time_weight=0.0,
@@ -195,7 +195,7 @@ class SpectralLoss(Loss):
       self.spectrogram_ops.append(spectrogram_op)
 
   def call(self, target_audio, audio, *args, weights=None):
-    logging.debug(f"In SpectralLoss.call")
+    logging.debug(f"In SpectralLoss.call, fft_sizes: {self.fft_sizes}")
 
     loss = 0.0
 

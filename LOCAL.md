@@ -150,9 +150,6 @@ sudo apt-get install --no-install-recommends libnvinfer6=6.0.1-1+cuda10.1 \
 
 
 # GCP
-gcloud auth login
-gcloud config set project ddsp2-374016
-gcloud compute ssh --ssh-flag="-ServerAliveInterval=30" --zone us-east1-c instance-gpu
 
 ```shell
 sudo su
@@ -183,7 +180,10 @@ gsutil -u ddsp-366504 cp -r gs://pratik-ddsp-data ~/buckets
 gsutil -u ddsp2-374016 cp -r gs://pratik-ddsp2-data ~/buckets
 #gsutil -> https://hartwigmedical.github.io/documentation/accessing-hartwig-data-through-gcp.html#accessing-data THIS works!!
 
-
+gcloud auth login
+gcloud config set project ddsp2-374016
+gcloud compute ssh --ssh-flag="-ServerAliveInterval=30" --zone us-east1-c instance-gpu
+wandb login
 
 # install docker. IFF not already installed
 
@@ -209,12 +209,12 @@ python /root/ddsp/ddsp/training/data_preparation/ddsp_prepare_tfrecord.py \
 
 # new GCP account. f0 from di stuff
 DEBUG=1 python /root/ddsp/ddsp/training/data_preparation/ddsp_prepare_tfrecord.py \
---input_audio_filepatterns='/root/buckets/pratik-ddsp2-data/monophonic-passagebased/09*wav' \
+--input_audio_filepatterns='/root/buckets/pratik-ddsp2-data/monophonic-passagebased/*wav' \
 --output_tfrecord_path=/root/tfrecord/train.tfrecord \
 --chunk_secs=0.0 \
 --num_shards=10 \
 --f0_from_di=True \
---alsologtostderr
+--alsologtostderr >> ~/logs/data_prep_16k_f0_from_di_$(date +%Y%m%d_%H%M%S).log 2>&1 &
 ```
 ### just download tfrecords from wisteria to test ddsp_run
 rsync -av w:/work/gk77/k77021/data/ddsp/monophonic "/Users/pratik/data/ddsp_tfrecords"
@@ -669,3 +669,29 @@ ddsp_run \
 --gin_param='F0LoudnessPreprocessor.frame_rate=250' \
 --gin_param='F0LoudnessPreprocessor.sample_rate=44000' \  --gin_param='oscillator_bank.use_angular_cumsum=True' \
 --gin_param="TFRecordProvider.frame_rate=250" >> ~/logs/ddsp_run-vanilla_ae_13B_sr44k_fr250_loss4096_$(date +%Y%m%d_%H%M%S).log 2>&1 &
+
+
+
+
+
+# new GCP account. f0 from di stuff
+DEBUG=1 python /root/ddsp/ddsp/training/data_preparation/ddsp_prepare_tfrecord.py \
+--input_audio_filepatterns='/root/buckets/pratik-ddsp2-data/monophonic-passagebased/*wav' \
+--output_tfrecord_path=/root/tfrecord/train.tfrecord \
+--chunk_secs=0.0 \
+--num_shards=10 \
+--f0_from_di=True \
+--alsologtostderr >> ~/logs/data_prep_16k_f0_from_di_$(date +%Y%m%d_%H%M%S).log 2>&1 &
+
+
+DEBUG=1 python /root/ddsp/ddsp/training/ddsp_run.py \
+DEBUG=1 ddsp_run \
+--mode=train \
+--run_name=ae_f0_from_di \
+--gin_file=/root/ddsp/ddsp/training/gin/models/ae.gin \
+--gin_file=/root/ddsp/ddsp/training/gin/datasets/tfrecord.gin \
+--gin_file=/root/ddsp/ddsp/training/gin/eval/basic_f0_ld.gin \
+--gin_param="TFRecordProvider.file_pattern='/root/tfrecord/train.tfrecord*'" \
+--gin_param="batch_size=16" \
+--gin_param="train.steps_per_save=1000" \
+--alsologtostderr >> ~/logs/ddsp_run-ae_f0_from_di_$(date +%Y%m%d_%H%M%S).log 2>&1 &
