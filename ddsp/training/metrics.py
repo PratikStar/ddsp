@@ -56,7 +56,7 @@ def is_outlier(ground_truth_f0_conf):
 def compute_audio_features(audio, frame_rate=250):
   """Compute features from audio."""
 
-  print(f"frame_rate for audio features: {frame_rate}")
+  logging.debug(f"frame_rate for audio features: {frame_rate}")
 
   audio_feats = {'audio': audio}
   audio = squeeze(audio)

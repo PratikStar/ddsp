@@ -684,14 +684,27 @@ DEBUG=1 python /root/ddsp/ddsp/training/data_preparation/ddsp_prepare_tfrecord.p
 --alsologtostderr >> ~/logs/data_prep_16k_f0_from_di_$(date +%Y%m%d_%H%M%S).log 2>&1 &
 
 
-DEBUG=1 python /root/ddsp/ddsp/training/ddsp_run.py \
-DEBUG=1 ddsp_run \
+DEBUG=1 
+ddsp_run \
 --mode=train \
---run_name=ae_f0_from_di \
+--run_name=ae-f0_di \
 --gin_file=/root/ddsp/ddsp/training/gin/models/ae.gin \
 --gin_file=/root/ddsp/ddsp/training/gin/datasets/tfrecord.gin \
 --gin_file=/root/ddsp/ddsp/training/gin/eval/basic_f0_ld.gin \
 --gin_param="TFRecordProvider.file_pattern='/root/tfrecord/train.tfrecord*'" \
 --gin_param="batch_size=16" \
 --gin_param="train.steps_per_save=1000" \
---alsologtostderr >> ~/logs/ddsp_run-ae_f0_from_di_$(date +%Y%m%d_%H%M%S).log 2>&1 &
+--alsologtostderr >> ~/logs/ddsp_run-ae-f0_di_$(date +%Y%m%d_%H%M%S).log 2>&1 &
+
+
+DEBUG=1 
+ddsp_run \
+--mode=train \
+--run_name=ae_last-f0_di \
+--gin_file=/root/ddsp/ddsp/training/gin/models/ae_mfccRnnEncoder_last.gin \
+--gin_file=/root/ddsp/ddsp/training/gin/datasets/tfrecord.gin \
+--gin_file=/root/ddsp/ddsp/training/gin/eval/basic_f0_ld.gin \
+--gin_param="TFRecordProvider.file_pattern='/root/tfrecord/train.tfrecord*'" \
+--gin_param="batch_size=16" \
+--gin_param="train.steps_per_save=1000" \
+--alsologtostderr >> ~/logs/ddsp_run-ae_last-f0_di_$(date +%Y%m%d_%H%M%S).log 2>&1 &
