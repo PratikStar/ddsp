@@ -1,8 +1,11 @@
 #!/bin/bash
 #PJM -g gk77
-#PJM -L rscgrp=share-interactive
-#PJM -N ddsprun
+#PJM -L rscgrp=regular-a
+#PJM -L node=1
+#PJM -N ddsp_single_note
 #PJM -j
+#PJM -m b
+#PJM -m e
 
 source /work/01/gk77/k77021/.bashrc
 echo "loaded source"
@@ -10,26 +13,6 @@ export HOME=/work/01/gk77/k77021
 pwd
 pip install .
 
-echo "====== GPU info ======"
-nvidia-smi
-echo "======================"
-
-#DEBUG=1 python /work/gk77/k77021/repos/ddsp/ddsp/training/data_preparation/ddsp_prepare_tfrecord.py \
-#--input_audio_filepatterns='/work/gk77/k77021/data/A_sharp_3/*wav' \
-#--output_tfrecord_path=/work/gk77/k77021/data/ddsp/tfrecord-A_sharp_3-sr44k/train.tfrecord \
-#--chunk_secs=0.0 \
-#--frame_rate=250 \
-#--num_shards=10 \
-#--example_secs=4 \
-#--sample_rate=44000 \
-#--f0_from_di=False \
-#--alsologtostderr
-#
-echo "====== env info ======"
-env | grep CUDA
-env | grep cuda
-env | grep XLA_FLAGS
-echo "======================"
 
 XLA_FLAGS=--xla_gpu_cuda_data_dir=/work/opt/local/x86_64/cores/cuda* ddsp_run \
 --mode=train \
@@ -41,8 +24,6 @@ XLA_FLAGS=--xla_gpu_cuda_data_dir=/work/opt/local/x86_64/cores/cuda* ddsp_run \
 --gin_param="batch_size=8" \
 --save_dir=/work/gk77/k77021/ddsp/save_dir_ \
 --restore_dir=/work/gk77/k77021/ddsp/save_dir_ \
---steps_per_summary=2 \
---steps_per_save=1 \
 --alsologtostderr \
 --gin_param="TFRecordProvider.sample_rate=44000" \
 --gin_param="Harmonic.sample_rate=44000" \

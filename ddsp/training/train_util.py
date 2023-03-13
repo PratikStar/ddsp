@@ -30,6 +30,8 @@ import wandb
 import io
 from scipy.io import wavfile
 import numpy as np
+import soundfile as sf
+
 # ---------------------- Helper Functions --------------------------------------
 def get_strategy(tpu='', cluster_config=''):
   """Create a distribution strategy for running on accelerators.
@@ -362,7 +364,7 @@ def train(data_provider,
 
         noise_output = out['filtered_noise']['signal']
         resynth_audio = out['out']['signal']
-
+        logging.debug(out.keys())
         do_val_stuff("harmonic", run_name=run_name, audio=harmonic_output, step=step.numpy(), save_dir=save_dir, sample_rate=sample_rate)
         do_val_stuff("noise", run_name=run_name, audio=noise_output, step=step.numpy(), save_dir=save_dir, sample_rate=sample_rate)
         do_val_stuff("resynth_audio", run_name=run_name, audio=resynth_audio, step=step.numpy(), save_dir=save_dir, sample_rate=sample_rate)
@@ -378,25 +380,25 @@ def train(data_provider,
 
   logging.info('Training Finished!')
 
-def do_val_stuff(name, run_name, audio, step, save_dir, sample_rate=16000):
+def do_val_stuff(name, run_name, audio, step, save_dir, sample_rate):
   if len(audio.shape) == 2:
     audio = audio[0]
-
   normalizer = float(np.iinfo(np.int16).max)
   array_of_ints = np.array(np.asarray(audio) * normalizer, dtype=np.int16)
   audio_file = f"{save_dir}/audio/{name}-{str(step)}.wav"
   wavfile.write(audio_file, sample_rate, array_of_ints)
 
-  artifact = wandb.Artifact(f"audios-{run_name}", type='dataset')
-  artifact.add_file(audio_file)
-  wandb.log_artifact(artifact)
+  wandb.log(
+    {f"{name}-{str(step)}": wandb.Audio(
+      array_of_ints,
+      caption=f"{name}", sample_rate=sample_rate)})
 
   # spectrogram stuff
-  spectrogram_sizes = [256, 512, 1024, 2048, 4096]
-  fig, axes = plt.subplots(nrows=5,
+  spectrogram_sizes = [512, 2048]
+  fig, axes = plt.subplots(nrows=2,
                            ncols=1,
                            sharex=False,
-                           figsize=(20, 16))
+                           figsize=(8, 16))
 
   for i in range(len(spectrogram_sizes)):
     ax = axes[i]

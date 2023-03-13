@@ -708,3 +708,28 @@ ddsp_run \
 --gin_param="batch_size=16" \
 --gin_param="train.steps_per_save=1000" \
 --alsologtostderr >> ~/logs/ddsp_run-ae_last-f0_di_$(date +%Y%m%d_%H%M%S).log 2>&1 &
+
+
+DEBUG=1 ddsp_run \
+--mode=train \
+--run_name=ae_mean-f0_di \
+--gin_file=/root/ddsp/ddsp/training/gin/models/ae_mfccRnnEncoder_mean.gin \
+--gin_file=/root/ddsp/ddsp/training/gin/datasets/tfrecord.gin \
+--gin_file=/root/ddsp/ddsp/training/gin/eval/basic_f0_ld.gin \
+--gin_param="TFRecordProvider.file_pattern='/root/tfrecord/train.tfrecord*'" \
+--gin_param="batch_size=16" \
+--gin_param="train.steps_per_save=1000" \
+--alsologtostderr >> ~/logs/ddsp_run-ae_last-f0_di_$(date +%Y%m%d_%H%M%S).log 2>&1 &
+
+
+
+`
+# 1. Rsync repo
+cd /Users/pratik/repos/ddsp
+watch -d -n5 "rsync -av --exclude-from=\".rsyncignore_upload\" \"/Users/pratik/repos/ddsp\" w:/work/gk77/k77021/repos"
+
+nohup watch -d -n5 rsync -av --exclude-from=".rsyncignore_upload" "/Users/pratik/repos/ddsp" w:/work/gk77/k77021/repos 0<&- &> /dev/null &
+
+# 2. Rsync data
+cd /Users/pratik/data/A_sharp_3
+rsync -avz "/Users/pratik/data/A_sharp_3" w:/work/gk77/k77021/data

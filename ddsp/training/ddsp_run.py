@@ -117,6 +117,10 @@ flags.DEFINE_multi_string('gin_param', [],
 flags.DEFINE_boolean('run_once', False, 'Whether evaluation will run once.')
 flags.DEFINE_integer('initial_delay_secs', None,
                      'Time to wait before evaluation starts')
+flags.DEFINE_integer('steps_per_summary', 200,
+                     'steps_per_summary')
+flags.DEFINE_integer('steps_per_save', 200,
+                     'steps_per_save')
 
 GIN_PATH = pkg_resources.resource_filename(__name__, 'gin')
 
@@ -181,6 +185,7 @@ def main(unused_argv):
 
   restore_dir = os.path.expanduser(FLAGS.restore_dir + run_name)
   save_dir = os.path.expanduser(FLAGS.save_dir + run_name)
+  print(restore_dir)
 
   # If no separate restore directory is given, use the save directory.
   restore_dir = save_dir if not restore_dir else restore_dir
@@ -218,6 +223,8 @@ def main(unused_argv):
                      # validation_data_provider=gin.REQUIRED,
                      run_name=run_name,
                      trainer=trainer,
+                     steps_per_summary=FLAGS.steps_per_summary,
+                     steps_per_save=FLAGS.steps_per_save,
                      save_dir=save_dir,
                      restore_dir=restore_dir,
                      early_stop_loss_value=FLAGS.early_stop_loss_value,
