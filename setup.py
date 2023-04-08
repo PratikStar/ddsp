@@ -42,7 +42,7 @@ setuptools.setup(
         'crepe<=0.0.12',
         'future==0.18.3',
         'gin-config>=0.3.0',
-        'google-cloud-storage',
+        'google-cloud-storage==2.8.0',
         'hmmlearn<=0.2.7',
         'librosa==0.10.0.post2',
         'pydub==0.25.1',
