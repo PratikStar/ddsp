@@ -101,7 +101,7 @@ def _get_f0_estimate_from_di(ex, frame_rate, center, viterbi):
     filename = ex['audio_path'].split('/')[-1]
     passage = filename.split(" ")[-2]
     if not passage.isnumeric():
-        raise Exception('Exception while parsing the passage number')
+        raise Exception(f'Exception while parsing the passage number: {passage}')
     di_audio_path = "/".join(ex['audio_path'].split("/")[:-1]) + f"/09A DI - {passage} .wav"
     if di_audio_path not in di_f0_estimates:
         logging.debug(f"keys of di_f0_estimates: {di_f0_estimates.keys()}")

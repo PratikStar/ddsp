@@ -180,6 +180,8 @@ gsutil -u ddsp-366504 cp -r gs://pratik-ddsp-data ~/buckets
 gsutil -u ddsp2-374016 cp -r gs://pratik-ddsp2-data ~/buckets
 #gsutil -> https://hartwigmedical.github.io/documentation/accessing-hartwig-data-through-gcp.html#accessing-data THIS works!!
 
+gsutil -u nws-oc cp -r gs://pratik-timbre-data ~/buckets
+
 gcloud auth login
 gcloud config set project ddsp2-374016
 gcloud compute ssh --ssh-flag="-ServerAliveInterval=30" --zone us-east1-c instance-gpu
