@@ -112,6 +112,7 @@ def _get_f0_estimate_from_di(ex, frame_rate, center, viterbi):
             di_audio, frame_rate, viterbi=viterbi, padding=padding)
 
         logging.debug(f"Fo Confidence: {f0_confidence.shape}")
+        logging.debug(f"confidence mean: {}")
         di_f0_estimates[di_audio_path] = {
             'f0_hz': f0_hz,
             'f0_confidence': f0_confidence
