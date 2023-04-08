@@ -750,7 +750,7 @@ rsync -avz "/Users/pratik/data/di_1_one_clip" w:/work/gk77/k77021/data
 rsync -av w:/work/gk77/k77021/data/A_sharp_3 "/Users/pratik/Downloads"
 
 
-gsutil -u ddsp-366504 cp -r gs://pratik-ddsp-data ~/buckets
+gsutil -u nws-gb cp -r gs://pratik-timbre-data-gb ~/buckets
 
 
 DEBUG=1 python /root/ddsp/ddsp/training/data_preparation/ddsp_prepare_tfrecord.py \
