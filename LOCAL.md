@@ -683,6 +683,14 @@ DEBUG=1 python /root/ddsp/ddsp/training/data_preparation/ddsp_prepare_tfrecord.p
 --f0_from_di=True \
 --alsologtostderr >> ~/logs/data_prep_16k_f0_from_di_$(date +%Y%m%d_%H%M%S).log 2>&1 &
 
+ddsp_prepare_tfrecord \
+--input_audio_filepatterns='/work/gk77/k77021/data/timbre/monophonic-4secchunks/*wav' \
+--output_tfrecord_path=/work/gk77/k77021/data/ddsp/monophonic/train.tfrecord \
+--num_shards=10 \
+--sample_rate=44100 \
+--alsologtostderr
+
+
 
 DEBUG=1 
 ddsp_run \

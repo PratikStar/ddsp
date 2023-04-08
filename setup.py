@@ -46,7 +46,7 @@ setuptools.setup(
         'hmmlearn<=0.2.7',
         'librosa',
         'pydub',
-        'protobuf<=3.20.*',  # temporary fix for proto dependency bug
+        # 'protobuf<=3.20.*',  # temporary fix for proto dependency bug
         'mir_eval',
         'note_seq<0.0.4',
         'numpy',
