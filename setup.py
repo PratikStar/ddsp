@@ -44,7 +44,7 @@ setuptools.setup(
         'gin-config>=0.3.0',
         'google-cloud-storage',
         'hmmlearn<=0.2.7',
-        'librosa',
+        'librosa==0.10.0.post2',
         'pydub',
         # 'protobuf<=3.20.*',  # temporary fix for proto dependency bug
         'mir_eval',
