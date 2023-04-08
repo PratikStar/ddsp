@@ -754,7 +754,7 @@ rsync -av w:/work/gk77/k77021/data/A_sharp_3 "/Users/pratik/Downloads"
 
 
 gsutil -u nws-gb cp -r gs://pratik-timbre-data-gb ~/buckets
-gsutil -u ddsp2 cp -r gs://pratik-timbre-data-gpu ~/buckets
+gsutil -u nws1-382311 cp -r gs://pratik-timbre-data-gpu ~/buckets
 
 
 DEBUG=1 python /root/ddsp/ddsp/training/data_preparation/ddsp_prepare_tfrecord.py \
