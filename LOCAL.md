@@ -748,3 +748,16 @@ rsync -avz "/Users/pratik/data/di_1_one_clip" w:/work/gk77/k77021/data
 
 # from wisteria
 rsync -av w:/work/gk77/k77021/data/A_sharp_3 "/Users/pratik/Downloads"
+
+
+
+DEBUG=1 ddsp_run \
+--mode=train \
+--run_name=ismir_ae \
+--gin_file=/root/ddsp/ddsp/training/gin/models/ae.gin \
+--gin_file=/root/ddsp/ddsp/training/gin/datasets/tfrecord.gin \
+--gin_file=/root/ddsp/ddsp/training/gin/eval/basic_f0_ld.gin \
+--gin_param="train.steps_per_save=1000" \
+--gin_param="TFRecordProvider.file_pattern='/root/data/ddsp/tfrecord_final_sr16k/train.tfrecord*'" \
+--gin_param="batch_size=16" \
+--alsologtostderr >> ~/logs/ddsp_run-ismir_ae_$(date +%Y%m%d_%H%M%S).log 2>&1 &

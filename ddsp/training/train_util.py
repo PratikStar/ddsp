@@ -389,9 +389,9 @@ def do_val_stuff(name, run_name, audio, step, save_dir, sample_rate):
   wavfile.write(audio_file, sample_rate, array_of_ints)
 
   wandb.log(
-    {f"au-{name}-{step:05d}": wandb.Audio(
+    {f"au-{name}": wandb.Audio(
       array_of_ints,
-      caption=f"{name}", sample_rate=sample_rate)})
+      caption=f"{name}-{step:05d}", sample_rate=sample_rate)})
 
   # spectrogram stuff
   spectrogram_sizes = [512, 2048]
@@ -415,6 +415,6 @@ def do_val_stuff(name, run_name, audio, step, save_dir, sample_rate):
   image_file = f"{save_dir}/spectrograms/spec-{name}-{str(step)}.png"
   fig.savefig(image_file)
 
-  wandb.log({f"spec-{name}-{step:05d}": wandb.Image(image_file)})
+  wandb.log({f"spec-{name}": wandb.Image(image_file, caption=f"{name}-{step:05d}")})
 
 
