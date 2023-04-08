@@ -49,7 +49,7 @@ setuptools.setup(
         # 'protobuf<=3.20.*',  # temporary fix for proto dependency bug
         'mir_eval',
         'note_seq<0.0.4',
-        'numpy==1.8.0',
+        'numpy==1.14.5',
         'scipy',
         'six',
         'tensorflow',
