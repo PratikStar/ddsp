@@ -759,7 +759,7 @@ DEBUG=1 python /root/ddsp/ddsp/training/data_preparation/ddsp_prepare_tfrecord.p
 --chunk_secs=0.0 \
 --frame_rate=250 \
 --num_shards=10 \
---example_secs=4 \
+--example_secs=1 \
 --f0_from_di=True \
 --sample_rate=16000 \
 --alsologtostderr >> ~/logs/ddsp_data-final_sr16k_$(date +%Y%m%d_%H%M%S).log 2>&1 &
