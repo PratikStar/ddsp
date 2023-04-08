@@ -45,7 +45,7 @@ setuptools.setup(
         'google-cloud-storage',
         'hmmlearn<=0.2.7',
         'librosa==0.10.0.post2',
-        'pydub',
+        'pydub==0.25.1',
         # 'protobuf<=3.20.*',  # temporary fix for proto dependency bug
         'mir_eval',
         'note_seq<0.0.4',
