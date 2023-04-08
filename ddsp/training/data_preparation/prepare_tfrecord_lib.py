@@ -302,8 +302,8 @@ def prepare_tfrecord(input_audio_paths,
                 | beam.Create(input_audio_paths)
                 | beam.Map(_load_audio, sample_rate))
 
-        print(f"examples type are: {type(examples)}")
-        print(f"examples are: {examples}")
+        logging.info(f"examples type are: {type(examples)}")
+        logging.info(f"examples are: {examples}")
         # Split into chunks for train/eval split and better parallelism.
         if chunk_secs:
             examples |= beam.FlatMap(
