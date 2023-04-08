@@ -733,3 +733,8 @@ nohup watch -d -n5 rsync -av --exclude-from=".rsyncignore_upload" "/Users/pratik
 # 2. Rsync data
 cd /Users/pratik/data/A_sharp_3
 rsync -avz "/Users/pratik/data/A_sharp_3" w:/work/gk77/k77021/data
+rsync -avz "/Users/pratik/data/single_note_distorted" w:/work/gk77/k77021/data
+rsync -avz "/Users/pratik/data/di_1_one_clip" w:/work/gk77/k77021/data
+
+# from wisteria
+rsync -av w:/work/gk77/k77021/data/A_sharp_3 "/Users/pratik/Downloads"

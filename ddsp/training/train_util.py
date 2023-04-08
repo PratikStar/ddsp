@@ -367,7 +367,7 @@ def train(data_provider,
         logging.debug(out.keys())
         do_val_stuff("harmonic", run_name=run_name, audio=harmonic_output, step=step.numpy(), save_dir=save_dir, sample_rate=sample_rate)
         do_val_stuff("noise", run_name=run_name, audio=noise_output, step=step.numpy(), save_dir=save_dir, sample_rate=sample_rate)
-        do_val_stuff("resynth_audio", run_name=run_name, audio=resynth_audio, step=step.numpy(), save_dir=save_dir, sample_rate=sample_rate)
+        do_val_stuff("resynth", run_name=run_name, audio=resynth_audio, step=step.numpy(), save_dir=save_dir, sample_rate=sample_rate)
 
         # Other things
         trainer.save(save_dir)
@@ -385,11 +385,11 @@ def do_val_stuff(name, run_name, audio, step, save_dir, sample_rate):
     audio = audio[0]
   normalizer = float(np.iinfo(np.int16).max)
   array_of_ints = np.array(np.asarray(audio) * normalizer, dtype=np.int16)
-  audio_file = f"{save_dir}/audio/{name}-{str(step)}.wav"
+  audio_file = f"{save_dir}/audio/au-{name}-{str(step)}.wav"
   wavfile.write(audio_file, sample_rate, array_of_ints)
 
   wandb.log(
-    {f"{name}-{str(step)}": wandb.Audio(
+    {f"au-{name}-{step:05d}": wandb.Audio(
       array_of_ints,
       caption=f"{name}", sample_rate=sample_rate)})
 
@@ -412,9 +412,9 @@ def do_val_stuff(name, run_name, audio, step, save_dir, sample_rate):
                 aspect='auto')
     ax.set_xlabel(f"spectrogram for size={spectrogram_sizes[i]}")
 
-  image_file = f"{save_dir}/spectrograms/{name}-{str(step)}.png"
+  image_file = f"{save_dir}/spectrograms/spec-{name}-{str(step)}.png"
   fig.savefig(image_file)
 
-  wandb.log({f"{name}-{str(step)}": wandb.Image(image_file)})
+  wandb.log({f"spec-{name}-{step:05d}": wandb.Image(image_file)})
 
 
