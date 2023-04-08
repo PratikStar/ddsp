@@ -771,7 +771,6 @@ DEBUG=1 ddsp_run \
 --gin_file=/root/ddsp/ddsp/training/gin/models/ae_mfccRnnEncoder_mean.gin \
 --gin_file=/root/ddsp/ddsp/training/gin/datasets/tfrecord.gin \
 --gin_file=/root/ddsp/ddsp/training/gin/eval/basic_f0_ld.gin \
---gin_param="train.steps_per_save=1000" \
 --gin_param="train.steps_per_save=2" \
 --gin_param="TFRecordProvider.file_pattern='/root/data/ddsp/tfrecord_final_sr16k/train.tfrecord*'" \
 --gin_param="batch_size=8" \
