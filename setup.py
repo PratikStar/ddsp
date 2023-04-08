@@ -47,7 +47,7 @@ setuptools.setup(
         'librosa==0.10.0.post2',
         'pydub==0.25.1',
         # 'protobuf<=3.20.*',  # temporary fix for proto dependency bug
-        'mir_eval',
+        'mir_eval==0.7',
         'note_seq<0.0.4',
         'numpy==1.14.5',
         'scipy==1.7.3',
