@@ -50,7 +50,7 @@ setuptools.setup(
         'mir_eval',
         'note_seq<0.0.4',
         'numpy==1.14.5',
-        'scipy',
+        'scipy==1.7.3',
         'six',
         'tensorflow',
         'tensorflow-addons',
