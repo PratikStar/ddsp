@@ -51,7 +51,7 @@ setuptools.setup(
         'note_seq<0.0.4',
         'numpy==1.14.5',
         'scipy==1.7.3',
-        'six',
+        'six==1.16.0',
         'tensorflow',
         'tensorflow-addons',
         'tensorflowjs<3.19',
