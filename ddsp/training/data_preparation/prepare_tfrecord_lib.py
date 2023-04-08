@@ -168,7 +168,7 @@ def _add_loudness(ex, frame_rate, n_fft, center):
 
 def _split_example(ex, sample_rate, frame_rate, example_secs, hop_secs, center):
     """Splits example into windows, padding final window if needed."""
-    logging.debug(f"In _split_example\n")
+    logging.info(f"In _split_example\n")
     # logging.debug(f"{ex}")
 
     def get_windows(sequence, rate, center):
