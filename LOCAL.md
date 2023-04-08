@@ -759,11 +759,11 @@ gsutil -u nws1-382311 cp -r gs://pratik-timbre-data-gpu ~/buckets
 
 DEBUG=1 python /root/ddsp/ddsp/training/data_preparation/ddsp_prepare_tfrecord.py \
 --input_audio_filepatterns='/root/buckets/pratik-timbre-data-gpu/monophonic-4secchunks/01*wav' \
---output_tfrecord_path=/root/data/ddsp/tfrecord_final_sr16k_4sec/train.tfrecord \
+--output_tfrecord_path=/root/data/ddsp/tfrecord_final_sr16k_1sec/train.tfrecord \
 --chunk_secs=0.0 \
 --frame_rate=250 \
 --num_shards=10 \
---example_secs=4 \
+--example_secs=1 \
 --f0_from_di=True \
 --sample_rate=16000 \
 --alsologtostderr >> ~/logs/ddsp_data-final_sr16k_$(date +%Y%m%d_%H%M%S).log 2>&1 &
