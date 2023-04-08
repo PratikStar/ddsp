@@ -58,7 +58,7 @@ setuptools.setup(
         'tensorflow-probability',
         'tensorflow-datasets',
         'tflite_support',
-        'Pillow==9.5.0',
+        'Pillow==9.0.0',
 
     ],
     extras_require={
