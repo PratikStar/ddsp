@@ -110,6 +110,8 @@ def _get_f0_estimate_from_di(ex, frame_rate, center, viterbi):
         padding = 'center' if center else 'same'
         f0_hz, f0_confidence = spectral_ops.compute_f0(
             di_audio, frame_rate, viterbi=viterbi, padding=padding)
+
+        
         di_f0_estimates[di_audio_path] = {
             'f0_hz': f0_hz,
             'f0_confidence': f0_confidence
