@@ -365,6 +365,7 @@ def train(data_provider,
         noise_output = out['filtered_noise']['signal']
         resynth_audio = out['out']['signal']
         logging.debug(out.keys())
+        logging.debug(out['audio'])
         do_val_stuff("harmonic", run_name=run_name, audio=harmonic_output, step=step.numpy(), save_dir=save_dir, sample_rate=sample_rate)
         do_val_stuff("noise", run_name=run_name, audio=noise_output, step=step.numpy(), save_dir=save_dir, sample_rate=sample_rate)
         do_val_stuff("resynth", run_name=run_name, audio=resynth_audio, step=step.numpy(), save_dir=save_dir, sample_rate=sample_rate)
