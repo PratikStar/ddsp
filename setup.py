@@ -40,7 +40,7 @@ setuptools.setup(
         'absl-py',
         'cloudml-hypertune==0.1.0.dev6',
         'crepe<=0.0.12',
-        'future',
+        'future==0.18.3',
         'gin-config>=0.3.0',
         'google-cloud-storage',
         'hmmlearn<=0.2.7',
