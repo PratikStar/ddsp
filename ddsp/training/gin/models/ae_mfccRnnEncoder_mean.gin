@@ -22,7 +22,7 @@ Autoencoder.encoder = @encoders.MfccRnnEncoder()
 MfccRnnEncoder.rnn_channels = 512
 MfccRnnEncoder.rnn_type = 'gru'
 MfccRnnEncoder.z_dims = 16
-MfccRnnEncoder.mean_aggregate = False
+MfccRnnEncoder.mean_aggregate = True
 MfccRnnEncoder.z_time_steps = 125
 
 # Decoder
