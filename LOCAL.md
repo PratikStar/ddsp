@@ -757,7 +757,7 @@ gsutil -u nws-gb cp -r gs://pratik-timbre-data-gb ~/buckets
 
 
 DEBUG=1 python /root/ddsp/ddsp/training/data_preparation/ddsp_prepare_tfrecord.py \
---input_audio_filepatterns='/root/buckets/pratik-timbre-data-gb/monophonic-4secchunks/*wav' \
+--input_audio_filepatterns='/root/buckets/pratik-timbre-data-gpu/monophonic-4secchunks/*wav' \
 --output_tfrecord_path=/root/data/ddsp/tfrecord_final_sr16k/train.tfrecord \
 --chunk_secs=0.0 \
 --frame_rate=250 \
