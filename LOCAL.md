@@ -170,6 +170,9 @@ pip install apache-beam wandb
 pip install --upgrade ddsp
 mkdir ~/buckets ~/logs
 
+git clone https://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@github.com/PratikStar/ddsp.git
+pip install --force-reinstall ./ddsp
+
 ssh-keygen
 <add key to github>
 git clone git@github.com:PratikStar/ddsp.git
