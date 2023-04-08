@@ -771,7 +771,7 @@ DEBUG=1 python /root/ddsp/ddsp/training/data_preparation/ddsp_prepare_tfrecord.p
 
 DEBUG=1 ddsp_run \
 --mode=train \
---run_name=ismir_ae_mean \
+--run_name=ismir_ae_mean_tmp \
 --gin_file=/root/ddsp/ddsp/training/gin/models/ae_mfccRnnEncoder_mean.gin \
 --gin_file=/root/ddsp/ddsp/training/gin/datasets/tfrecord.gin \
 --gin_file=/root/ddsp/ddsp/training/gin/eval/basic_f0_ld.gin \
