@@ -38,7 +38,7 @@ setuptools.setup(
     scripts=[],
     install_requires=[
         'absl-py',
-        'cloudml-hypertune',
+        'cloudml-hypertune==0.1.0.dev6',
         'crepe<=0.0.12',
         'future',
         'gin-config>=0.3.0',
