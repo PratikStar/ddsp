@@ -56,7 +56,7 @@ setuptools.setup(
         'tensorflow-addons==0.19.0',
         'tensorflowjs<3.19',
         'tensorflow-probability==0.19.0',
-        'tensorflow-datasets',
+        'tensorflow-datasets==4.8.2',
         'tflite_support',
         'Pillow==9.0.0',
 
