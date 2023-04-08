@@ -51,7 +51,7 @@ flags.DEFINE_integer(
     'The frame rate to use for f0 and loudness features. If set to 0, '
     'these features will not be computed.')
 flags.DEFINE_float(
-    'example_secs', 4,
+    'example_secs', 1,
     'The length of each example in seconds. Input audio will be split to this '
     'length using a sliding window. If 0, each full piece of audio will be '
     'used as an example.')
