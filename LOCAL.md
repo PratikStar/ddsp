@@ -750,6 +750,20 @@ rsync -avz "/Users/pratik/data/di_1_one_clip" w:/work/gk77/k77021/data
 rsync -av w:/work/gk77/k77021/data/A_sharp_3 "/Users/pratik/Downloads"
 
 
+gsutil -u ddsp-366504 cp -r gs://pratik-ddsp-data ~/buckets
+
+
+DEBUG=1 python /root/ddsp/ddsp/training/data_preparation/ddsp_prepare_tfrecord.py \
+--input_audio_filepatterns='/root/buckets/pratik-timbre-data/monophonic-4secchunks/*wav' \
+--output_tfrecord_path=/root/data/ddsp/tfrecord_final_sr16k/train.tfrecord \
+--chunk_secs=0.0 \
+--frame_rate=250 \
+--num_shards=10 \
+--example_secs=4 \
+--f0_from_di=True \
+--sample_rate=16000 \
+--alsologtostderr >> ~/logs/ddsp_data-final_sr16k_$(date +%Y%m%d_%H%M%S).log 2>&1 &
+
 
 DEBUG=1 ddsp_run \
 --mode=train \
