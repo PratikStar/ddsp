@@ -774,4 +774,4 @@ DEBUG=1 ddsp_run \
 --gin_param="train.steps_per_save=1000" \
 --gin_param="TFRecordProvider.file_pattern='/root/data/ddsp/tfrecord_final_sr16k/train.tfrecord*'" \
 --gin_param="batch_size=16" \
---alsologtostderr >> ~/logs/ddsp_run-ismir_ae_$(date +%Y%m%d_%H%M%S).log 2>&1 &
+--alsologtostderr >> ~/logs/ddsp_run-ismir_ae_mean_$(date +%Y%m%d_%H%M%S).log 2>&1 &
