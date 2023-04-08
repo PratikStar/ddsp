@@ -52,7 +52,7 @@ setuptools.setup(
         'numpy==1.14.5',
         'scipy==1.7.3',
         'six==1.16.0',
-        'tensorflow',
+        'tensorflow==2.11.0',
         'tensorflow-addons',
         'tensorflowjs<3.19',
         'tensorflow-probability',
