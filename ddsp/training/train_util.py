@@ -364,6 +364,7 @@ def train(data_provider,
 
         noise_output = out['filtered_noise']['signal']
         resynth_audio = out['out']['signal']
+        logging.debug("************** HERE *****************")
         logging.debug(out.keys())
         logging.debug(out['audio'].shape)
         logging.debug(out['audio'])
