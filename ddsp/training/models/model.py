@@ -72,6 +72,7 @@ class Model(tf.keras.Model):
   def _update_losses_dict(self, loss_objs, *args, **kwargs):
     """Helper function to run loss objects on args and add to model losses."""
     logging.debug("In _update_losses_dict")
+    logging.debug()
     for loss_obj in ddsp.core.make_iterable(loss_objs):
       if hasattr(loss_obj, 'get_losses_dict'):
         losses_dict = loss_obj.get_losses_dict(*args, **kwargs)

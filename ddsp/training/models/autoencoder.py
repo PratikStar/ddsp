@@ -92,6 +92,7 @@ class Autoencoder(Model):
         outputs['audio_synth'] = pg_out['signal']
 
         if training:
+            logging.debug()
             self._update_losses_dict(
                 self.loss_objs, features['audio'], outputs['audio_synth'], features['z'])
 

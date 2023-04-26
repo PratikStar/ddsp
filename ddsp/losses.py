@@ -44,8 +44,9 @@ class Loss(tfkl.Layer):
 
   def get_losses_dict(self, *args, **kwargs):
     """Returns a dictionary of losses for the model."""
-    logging.debug("In Loss.get_losses_dict")
+    logging.debug(f"In Loss.get_losses_dict")
     loss = self(*args, **kwargs)
+    # logging.debug(f"loss: {loss}")
     return {self.name: loss}
 
 
